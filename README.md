@@ -3,12 +3,7 @@
 MineTenant の画面遷移を確認し、フロントエンド担当者がここから肉付けするための
 Vite + React + TypeScript 製ワイヤーフレーム土台です。
 
-> **以前の PoC とは別の独立プロジェクトです。**
-> 旧 PoC のコード、CSS、UI 部品、3D 表現、バックエンド構成は流用していません。
 > 今回の Figma にある画面遷移図とワイヤーフレームを起点に新規作成しています。
-
-参照した Figma:
-[画面遷移図／ワイヤーフレーム](https://www.figma.com/design/BPWjY8TuR2wPb7KJ2LdSvi/%E7%94%BB%E9%9D%A2%E9%81%B7%E7%A7%BB?node-id=15-418)
 
 ## この土台に含むもの
 
@@ -92,6 +87,3 @@ src/
 - 色や余白を変更: `src/shared/styles`
 - API を追加: `DemoStoreProvider` の処理をサービス層へ差し替える
 - Minecraft 表示を追加: `StoreManagePage` の「Minecraft店舗」予定枠へ実装する
-
-まず画面ごとに小さく担当を分け、共通 UI や型を変更するときだけメンバー間で
-方針を合わせる想定です。
