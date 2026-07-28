@@ -99,17 +99,7 @@
   border-radius: 4px;
 }
 
-.seller-card__icon {
-  display: grid;
-  width: 38px;
-  height: 38px;
-  flex: none;
-  place-items: center;
-  color: var(--color-primary);
-  background: var(--color-primary-soft);
-}
-
-.seller-card > span:nth-child(2) {
+.seller-card__details {
   display: grid;
   flex: 1;
 }

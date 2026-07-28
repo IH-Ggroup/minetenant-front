@@ -1,4 +1,4 @@
-import { ArrowLeft, Package, Store } from 'lucide-react';
+import { ArrowLeft, Package } from 'lucide-react';
 import { Link, useParams } from 'react-router-dom';
 
 import { useDemoStore } from '@/app/demo-store-context';
@@ -60,10 +60,7 @@ export function ProductDetailPage() {
 
           {store && (
             <Link className="seller-card" to={paths.store(store.id)}>
-              <span className="seller-card__icon" aria-hidden="true">
-                <Store size={22} />
-              </span>
-              <span>
+              <span className="seller-card__details">
                 <small>出品店舗</small>
                 <strong>{store.name}</strong>
               </span>
