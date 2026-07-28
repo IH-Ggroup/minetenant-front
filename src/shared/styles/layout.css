@@ -1,0 +1,135 @@
+.app-shell {
+  min-height: 100vh;
+}
+
+.app-header {
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.app-header__inner {
+  display: flex;
+  width: min(100% - 48px, var(--content-width));
+  min-height: 64px;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-8);
+  margin-inline: auto;
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: 1.05rem;
+}
+
+.brand__mark {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  place-items: center;
+  color: white;
+  background: var(--color-primary);
+  border-radius: 4px;
+}
+
+.main-nav {
+  display: flex;
+  align-items: stretch;
+  gap: var(--space-2);
+}
+
+.main-nav__link {
+  display: inline-flex;
+  min-height: 42px;
+  align-items: center;
+  padding-inline: var(--space-4);
+  color: var(--color-muted);
+  border-radius: 4px;
+  font-size: 0.92rem;
+  font-weight: 700;
+}
+
+.main-nav__link:hover,
+.main-nav__link.is-active {
+  color: var(--color-primary);
+  background: var(--color-primary-soft);
+}
+
+.prototype-note {
+  padding: 9px 24px;
+  color: var(--color-muted);
+  background: #f0f2f0;
+  border-bottom: 1px solid var(--color-border);
+  font-size: 0.8rem;
+  text-align: center;
+}
+
+.app-main {
+  width: min(100% - 48px, var(--content-width));
+  margin-inline: auto;
+  padding-block: var(--space-12);
+}
+
+.app-main:focus,
+.auth-layout:focus {
+  outline: none;
+}
+
+.auth-layout {
+  display: grid;
+  width: min(100% - 32px, 460px);
+  min-height: 100vh;
+  align-content: center;
+  gap: var(--space-4);
+  margin-inline: auto;
+  padding-block: var(--space-8);
+}
+
+.auth-layout__header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  font-size: 1.1rem;
+}
+
+.auth-layout__description {
+  color: var(--color-muted);
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+@media (max-width: 640px) {
+  .app-header__inner {
+    width: min(100% - 32px, var(--content-width));
+    min-height: auto;
+    align-items: flex-start;
+    flex-direction: column;
+    gap: var(--space-3);
+    padding-block: var(--space-3);
+  }
+
+  .main-nav {
+    width: 100%;
+    overflow-x: auto;
+  }
+
+  .main-nav__link {
+    flex: 1;
+    justify-content: center;
+    padding-inline: var(--space-2);
+    white-space: nowrap;
+  }
+
+  .prototype-note {
+    padding-inline: var(--space-4);
+    text-align: left;
+  }
+
+  .app-main {
+    width: min(100% - 32px, var(--content-width));
+    padding-block: var(--space-8);
+  }
+}
