@@ -9,7 +9,6 @@ import { paths } from '@/app/paths';
 import { MyPage } from '@/features/account/pages/MyPage';
 import { StoreManagePage } from '@/features/account/pages/StoreManagePage';
 import { StorePage } from '@/features/account/pages/StorePage';
-import { TransactionPage } from '@/features/account/pages/TransactionPage';
 import { AuthPage } from '@/features/auth/pages/AuthPage';
 import { ProductDetailPage } from '@/features/catalog/pages/ProductDetailPage';
 import { ProductListPage } from '@/features/catalog/pages/ProductListPage';
@@ -64,10 +63,6 @@ export const routeObjects: RouteObject[] = [
           },
           { path: 'stores/:storeId', element: <StorePage /> },
           { path: 'store/manage', element: <StoreManagePage /> },
-          {
-            path: 'transactions/:transactionId',
-            element: <TransactionPage />,
-          },
           { path: '*', element: <NotFoundPage /> },
         ],
       },

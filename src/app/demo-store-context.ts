@@ -3,7 +3,6 @@ import { createContext, useContext } from 'react';
 import type {
   CreateProductInput,
   DemoSnapshot,
-  OperationResult,
   Product,
   PurchaseResult,
   SessionUser,
@@ -18,7 +17,6 @@ export interface DemoStoreValue {
   saveListingDraft(draft: CreateProductInput | null): void;
   publishListing(): Product | null;
   purchaseProduct(productId: string): PurchaseResult;
-  sendMessage(transactionId: string, body: string): OperationResult;
 }
 
 export const DemoStoreContext = createContext<DemoStoreValue | null>(null);

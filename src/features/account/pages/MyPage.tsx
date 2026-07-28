@@ -1,5 +1,4 @@
-import { MessageCircle, PackagePlus, ReceiptText } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { PackagePlus, ReceiptText } from 'lucide-react';
 
 import { useDemoStore } from '@/app/demo-store-context';
 import { paths } from '@/app/paths';
@@ -74,11 +73,7 @@ export function MyPage() {
               );
 
               return (
-                <Link
-                  key={transaction.id}
-                  className="transaction-row"
-                  to={paths.transaction(transaction.id)}
-                >
+                <article key={transaction.id} className="transaction-row">
                   <span className="transaction-row__icon" aria-hidden="true">
                     <ReceiptText size={18} />
                   </span>
@@ -92,8 +87,7 @@ export function MyPage() {
                   <Badge tone="neutral">
                     {transactionStatusLabel(transaction.status)}
                   </Badge>
-                  <MessageCircle size={18} aria-hidden="true" />
-                </Link>
+                </article>
               );
             })}
           </div>

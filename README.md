@@ -70,7 +70,6 @@ npm run build
 | `/mypage`                            | マイページ             |
 | `/stores/:storeId`                   | 公開店舗               |
 | `/store/manage`                      | 店舗管理               |
-| `/transactions/:transactionId`       | 取引メッセージ         |
 
 ## ディレクトリ
 

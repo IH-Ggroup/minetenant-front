@@ -3,11 +3,9 @@ import { type PropsWithChildren, useCallback, useMemo, useState } from 'react';
 import { DemoStoreContext } from '@/app/demo-store-context';
 import type {
   CreateProductInput,
-  OperationResult,
   Product,
   PurchaseResult,
   Transaction,
-  TransactionMessage,
 } from '@/domain/models';
 import { createInitialDemoSnapshot, DEMO_USERS } from '@/mocks/fixtures';
 
@@ -87,29 +85,6 @@ export function DemoStoreProvider({ children }: PropsWithChildren) {
     [activeUser.id, state.products],
   );
 
-  const sendMessage = useCallback(
-    (transactionId: string, body: string): OperationResult => {
-      const trimmedBody = body.trim();
-      if (!trimmedBody) {
-        return { ok: false, error: 'メッセージを入力してください。' };
-      }
-
-      const message: TransactionMessage = {
-        id: `message-${crypto.randomUUID()}`,
-        transactionId,
-        senderId: activeUser.id,
-        body: trimmedBody,
-        createdAt: new Date().toISOString(),
-      };
-      setState((current) => ({
-        ...current,
-        messages: [...current.messages, message],
-      }));
-      return { ok: true };
-    },
-    [activeUser.id],
-  );
-
   const value = useMemo(
     () => ({
       state,
@@ -119,7 +94,6 @@ export function DemoStoreProvider({ children }: PropsWithChildren) {
       saveListingDraft,
       publishListing,
       purchaseProduct,
-      sendMessage,
     }),
     [
       activeStore,
@@ -128,7 +102,6 @@ export function DemoStoreProvider({ children }: PropsWithChildren) {
       publishListing,
       purchaseProduct,
       saveListingDraft,
-      sendMessage,
       state,
     ],
   );

@@ -15,5 +15,4 @@ export const paths = {
   sellComplete: (productId: string) => `/sell/complete/${productId}`,
   store: (storeId: string) => `/stores/${storeId}`,
   storeManage: '/store/manage',
-  transaction: (transactionId: string) => `/transactions/${transactionId}`,
 } as const;

@@ -52,14 +52,6 @@ export interface Transaction {
   createdAt: string;
 }
 
-export interface TransactionMessage {
-  id: string;
-  transactionId: string;
-  senderId: string;
-  body: string;
-  createdAt: string;
-}
-
 export interface CreateProductInput {
   name: string;
   description: string;
@@ -76,15 +68,11 @@ export interface DemoSnapshot {
   products: Product[];
   stores: Store[];
   transactions: Transaction[];
-  messages: TransactionMessage[];
   listingDraft: CreateProductInput | null;
 }
 
-export interface OperationResult {
+export interface PurchaseResult {
   ok: boolean;
   error?: string;
-}
-
-export interface PurchaseResult extends OperationResult {
   transactionId?: string;
 }

@@ -4,7 +4,6 @@ import type {
   SessionUser,
   Store,
   Transaction,
-  TransactionMessage,
 } from '@/domain/models';
 
 export const DEMO_USERS: SessionUser[] = [
@@ -147,23 +146,6 @@ export const INITIAL_TRANSACTIONS: Transaction[] = [
   },
 ];
 
-export const INITIAL_MESSAGES: TransactionMessage[] = [
-  {
-    id: 'message-1',
-    transactionId: 'transaction-demo',
-    senderId: 'user-seller',
-    body: 'ご購入ありがとうございます。明日の発送を予定しています。',
-    createdAt: '2026-07-21T08:34:00.000Z',
-  },
-  {
-    id: 'message-2',
-    transactionId: 'transaction-demo',
-    senderId: 'user-buyer',
-    body: 'ありがとうございます。到着を楽しみにしています！',
-    createdAt: '2026-07-21T09:02:00.000Z',
-  },
-];
-
 export function createInitialDemoSnapshot(): DemoSnapshot {
   return {
     schemaVersion: 1,
@@ -171,7 +153,6 @@ export function createInitialDemoSnapshot(): DemoSnapshot {
     products: structuredClone(INITIAL_PRODUCTS),
     stores: structuredClone(INITIAL_STORES),
     transactions: structuredClone(INITIAL_TRANSACTIONS),
-    messages: structuredClone(INITIAL_MESSAGES),
     listingDraft: null,
   };
 }

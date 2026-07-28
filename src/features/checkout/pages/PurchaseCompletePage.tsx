@@ -1,4 +1,4 @@
-import { ArrowRight, CheckCircle2, MessageCircle, Package } from 'lucide-react';
+import { ArrowRight, CheckCircle2, Package, UserRound } from 'lucide-react';
 import { useParams } from 'react-router-dom';
 
 import { useDemoStore } from '@/app/demo-store-context';
@@ -62,11 +62,8 @@ export function PurchaseCompletePage() {
       </section>
 
       <div className="completion-actions">
-        <ButtonLink
-          to={paths.transaction(transaction.id)}
-          leadingIcon={<MessageCircle size={18} />}
-        >
-          取引画面へ進む
+        <ButtonLink to={paths.myPage} leadingIcon={<UserRound size={18} />}>
+          マイページへ
         </ButtonLink>
         <ButtonLink
           to={paths.products}

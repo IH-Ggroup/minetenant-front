@@ -341,7 +341,7 @@
 
 .transaction-row {
   display: grid;
-  grid-template-columns: 36px minmax(0, 1fr) auto auto 20px;
+  grid-template-columns: 36px minmax(0, 1fr) auto auto;
   gap: var(--space-3);
   align-items: center;
   padding-block: var(--space-3);
@@ -371,92 +371,6 @@
 
 .transaction-row__price {
   font-weight: 700;
-}
-
-.message-panel {
-  overflow: hidden;
-  background: white;
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius);
-}
-
-.message-panel__heading {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  padding: var(--space-4);
-  border-bottom: 1px solid var(--color-border);
-}
-
-.message-panel__heading span {
-  margin-left: auto;
-  color: var(--color-muted);
-}
-
-.message-list {
-  display: grid;
-  gap: var(--space-4);
-  min-height: 220px;
-  padding: var(--space-4);
-  background: #fafbfa;
-}
-
-.message {
-  display: flex;
-  max-width: 80%;
-  align-items: flex-start;
-  gap: var(--space-2);
-}
-
-.message--mine {
-  justify-self: end;
-  flex-direction: row-reverse;
-}
-
-.message__avatar {
-  display: grid;
-  width: 32px;
-  height: 32px;
-  flex: none;
-  place-items: center;
-  color: var(--color-primary);
-  background: var(--color-primary-soft);
-  border: 1px solid #c9ded3;
-  border-radius: 50%;
-  font-size: 0.8rem;
-  font-weight: 700;
-}
-
-.message > div {
-  padding: 10px 12px;
-  background: white;
-  border: 1px solid var(--color-border);
-  border-radius: 4px;
-}
-
-.message--mine > div {
-  background: var(--color-primary-soft);
-  border-color: #c9ded3;
-}
-
-.message small {
-  display: block;
-  margin-top: var(--space-1);
-  color: var(--color-muted);
-  font-size: 0.72rem;
-}
-
-.message-form {
-  display: grid;
-  gap: var(--space-2);
-  padding: var(--space-4);
-  border-top: 1px solid var(--color-border);
-}
-
-.message-form > div {
-  display: flex;
-  align-items: flex-end;
-  gap: var(--space-3);
 }
 
 @media (max-width: 900px) {
@@ -528,18 +442,5 @@
   .transaction-row > .badge {
     grid-column: 3;
     grid-row: 1 / span 2;
-  }
-
-  .transaction-row > svg:last-child {
-    display: none;
-  }
-
-  .message {
-    max-width: 95%;
-  }
-
-  .message-form > div {
-    align-items: stretch;
-    flex-direction: column;
   }
 }
