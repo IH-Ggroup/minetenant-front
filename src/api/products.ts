@@ -1,4 +1,4 @@
-// API許可もらったらこれに合わせて使用するページの処理修正
+// API許可もらったらこれに合わせて使用するページの処理や型処理内容が変わった部分の名前修正する
 import type {
   SessionUser,
   PurchaseResult,

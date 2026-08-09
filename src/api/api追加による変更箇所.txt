@@ -1,5 +1,7 @@
-<!-- DemoStoreProviderファイルの内容をuser情報とサービス層に分割。API想定 -->
-/* user情報 */
+products.ts　API通信の関数が入っている
+api追加による変更箇所　DemoStoreProviderとdemo-store-contextファイルに書かれた内容をユーザー情報とサービス情報の処理に分割
+
+<!-- DemoStoreProvider ユーザー情報(ログイン時の処理とユーザー判別) -->
 import { type PropsWithChildren, useState } from 'react';
 import { DemoStoreContext } from '@/app/demo-store-context';
 import type { SessionUser } from '@/domain/models';
@@ -23,7 +25,7 @@ export function DemoStoreProvider({ children }: PropsWithChildren) {
   );
 }
 
-/* サービス層 */
+<!-- DemoStoreProvider サービス情報(出品時の入力内容一部保存) -->
 import { type PropsWithChildren, useState } from 'react';
 import { ServiceContext } from '@/app/service-context';
 import type { CreateProductInput } from '@/domain/models';
@@ -49,7 +51,7 @@ export function ServiceProvider({ children }: PropsWithChildren) {
 }
 
 
-<!-- demo-store-context分割ユーザー部 -->
+<!-- demo-store-context ユーザー情報 -->
 import { createContext, useContext } from 'react';
 import type { SessionUser } from '@/domain/models';
 export interface DemoStoreValue {
@@ -68,7 +70,7 @@ export function useDemoStore(): DemoStoreValue {
 }
 
 
-<!-- //demo-store-context分割サービス部 -->
+<!-- demo-store-context サービス情報 -->
 import { createContext, useContext } from 'react';
 import type { CreateProductInput } from '@/domain/models';
 export interface ServiceValue {
