@@ -1,4 +1,4 @@
-// API許可もらったらこれに合わせて使用するページの処理や型処理内容が変わった部分の名前修正する
+//APIの実装方法が適切かの確認のための内容
 import type {
   SessionUser,
   PurchaseResult,
@@ -43,7 +43,6 @@ export async function register(
     body: JSON.stringify({
       email,
       password,
-      name,
     }),
   });
   if (!response.ok) {
@@ -117,7 +116,7 @@ export async function deleteProduct(productId: string): Promise<void> {
   }
 }
 
-/* 商品を検索←検索ボックス見てあってるか確認 */
+/* 商品を検索 */
 export async function searchProducts(keyword: string): Promise<Product[]> {
   const params = new URLSearchParams({
     keyword,
