@@ -1,4 +1,3 @@
-//APIの実装方法が適切かの確認のための内容
 import type {
   SessionUser,
   PurchaseResult,
@@ -66,9 +65,11 @@ export async function getProducts(): Promise<Product[]> {
   const response = await fetch(`${API_BASE_URL}/products`, {
     method: 'GET',
   });
+
   if (!response.ok) {
     throw new Error('商品一覧の取得に失敗しました。');
   }
+
   return response.json() as Promise<Product[]>;
 }
 
@@ -137,15 +138,15 @@ export async function searchProducts(keyword: string): Promise<Product[]> {
 export async function purchaseProduct(
   productId: string,
 ): Promise<PurchaseResult> {
-  const response = await fetch(`${API_BASE_URL}/purchases`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
+  const response = await fetch(
+    `${API_BASE_URL}/products/${encodeURIComponent(productId)}/purchase`,
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
     },
-    body: JSON.stringify({
-      productId,
-    }),
-  });
+  );
   if (!response.ok) {
     throw new Error('商品の購入に失敗しました。');
   }
