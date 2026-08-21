@@ -53,6 +53,8 @@ export interface Transaction {
 }
 
 export interface CreateProductInput {
+  sellerId: string; //api一致用追加
+  storeId: string; //api一致用追加
   name: string;
   description: string;
   price: number;

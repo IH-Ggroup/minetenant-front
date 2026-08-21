@@ -20,7 +20,7 @@ interface ListingFormState {
 
 export function SellPage() {
   const navigate = useNavigate();
-  const { state, saveListingDraft } = useDemoStore();
+  const { state, activeUser, activeStore, saveListingDraft } = useDemoStore();
   const draft = state.listingDraft;
   const [form, setForm] = useState<ListingFormState>({
     name: draft?.name ?? '',
@@ -39,7 +39,10 @@ export function SellPage() {
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+
     saveListingDraft({
+      sellerId: activeUser.id, //認証処理完了まで一時的に入れる
+      storeId: activeStore.id, //認証処理完了まで一時的に入れる
       name: form.name.trim(),
       description: form.description.trim(),
       price: Number(form.price),
@@ -48,6 +51,7 @@ export function SellPage() {
       theme: 'forest',
       emoji: '📦',
     });
+
     navigate(paths.sellReview);
   };
 

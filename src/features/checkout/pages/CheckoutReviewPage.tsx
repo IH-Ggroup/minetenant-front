@@ -21,6 +21,7 @@ export function CheckoutReviewPage() {
   const { state, purchaseProduct } = useDemoStore();
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState('');
+  const [requestId] = useState(() => crypto.randomUUID()); //追加
   const product = state.products.find((item) => item.id === productId);
   const checkoutDraft =
     (location.state as { checkoutDraft?: CheckoutDraft } | null | undefined)
@@ -37,21 +38,23 @@ export function CheckoutReviewPage() {
     );
   }
 
-  const handlePurchase = () => {
+  const handlePurchase = async () => {
     if (isProcessing) return;
-
     setIsProcessing(true);
     setError('');
-
-    window.setTimeout(() => {
-      const result = purchaseProduct(product.id);
+    try {
+      const result = await purchaseProduct(product.id, requestId);
       if (result.ok && result.transactionId) {
         navigate(paths.purchaseComplete(result.transactionId));
         return;
       }
       setError(result.error ?? '購入処理に失敗しました。');
+    } catch (error) {
+      console.error('❌ 購入処理エラー:', error); //後で
+      setError('購入処理に失敗しました。');
+    } finally {
       setIsProcessing(false);
-    }, 650);
+    }
   };
 
   return (

@@ -26,8 +26,8 @@ export function SellReviewPage() {
     );
   }
 
-  const handlePublish = () => {
-    const product = publishListing();
+  const handlePublish = async () => {
+    const product = await publishListing();
     if (!product) {
       setError('出品情報を保存できませんでした。');
       return;

@@ -55,6 +55,8 @@ export function ProductListPage() {
               key={product.id}
               product={product}
               store={state.stores.find((store) => store.id === product.storeId)}
+              //取得した商品情報の中の店舗IDでstate.stores(店舗名含む情報入ってる)から店舗名探してる
+              // 店舗情報一括取得から既存のfind
             />
           ))}
         </section>

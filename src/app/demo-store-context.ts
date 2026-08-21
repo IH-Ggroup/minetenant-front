@@ -15,8 +15,12 @@ export interface DemoStoreValue {
   activeStore: Store;
   login(userId: string): void;
   saveListingDraft(draft: CreateProductInput | null): void;
-  publishListing(): Product | null;
-  purchaseProduct(productId: string): PurchaseResult;
+  publishListing(): Promise<Product | null>; //旧publishListing(): Product | null;
+  purchaseProduct(
+    productId: string,
+    requestId: string, //requestId：購入ボタンを押した1回の操作につき一つ生成し、再送時は同じ値を使用
+  ): Promise<PurchaseResult>;
+  //旧purchaseProduct(productId: string): PurchaseResult;
 }
 
 export const DemoStoreContext = createContext<DemoStoreValue | null>(null);

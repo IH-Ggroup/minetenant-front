@@ -1,11 +1,21 @@
-import { type PropsWithChildren, useCallback, useMemo, useState } from 'react';
+import {
+  type PropsWithChildren,
+  useCallback,
+  useMemo,
+  useState,
+  useEffect,
+} from 'react';
+import {
+  createProduct,
+  getProducts,
+  purchaseProduct as purchaseProductApi,
+} from '@/api/products';
 
 import { DemoStoreContext } from '@/app/demo-store-context';
 import type {
   CreateProductInput,
   Product,
   PurchaseResult,
-  Transaction,
 } from '@/domain/models';
 import { createInitialDemoSnapshot, DEMO_USERS } from '@/mocks/fixtures';
 
@@ -15,6 +25,18 @@ import { createInitialDemoSnapshot, DEMO_USERS } from '@/mocks/fixtures';
  */
 export function DemoStoreProvider({ children }: PropsWithChildren) {
   const [state, setState] = useState(createInitialDemoSnapshot);
+  useEffect(() => {
+    getProducts()
+      .then((products) => {
+        setState((current) => ({
+          ...current,
+          products,
+        }));
+      })
+      .catch((error) => {
+        console.error('商品取得×', error); //後で別のエラー処理
+      });
+  });
 
   const activeUser =
     DEMO_USERS.find((user) => user.id === state.currentUserId) ?? DEMO_USERS[0];
@@ -30,59 +52,49 @@ export function DemoStoreProvider({ children }: PropsWithChildren) {
     setState((current) => ({ ...current, listingDraft: draft }));
   }, []);
 
-  const publishListing = useCallback((): Product | null => {
-    if (!state.listingDraft) return null;
-
-    const product: Product = {
-      ...state.listingDraft,
-      id: `product-${crypto.randomUUID()}`,
-      storeId: activeStore.id,
-      sellerId: activeUser.id,
-      createdAt: new Date().toISOString(),
-    };
-
-    setState((current) => ({
-      ...current,
-      products: [product, ...current.products],
-      listingDraft: null,
-    }));
-    return product;
-  }, [activeStore.id, activeUser.id, state.listingDraft]);
-
-  const purchaseProduct = useCallback(
-    (productId: string): PurchaseResult => {
-      const product = state.products.find((item) => item.id === productId);
-      if (
-        !product ||
-        product.stock <= 0 ||
-        product.sellerId === activeUser.id
-      ) {
-        return { ok: false, error: 'この商品は購入できません。' };
-      }
-
-      const transaction: Transaction = {
-        id: `transaction-${crypto.randomUUID()}`,
-        productId: product.id,
-        buyerId: activeUser.id,
-        sellerId: product.sellerId,
-        source: 'web',
-        amount: product.price,
-        status: 'paid',
-        createdAt: new Date().toISOString(),
+  const publishListing = useCallback(async (): Promise<Product | null> => {
+    if (!state.listingDraft) {
+      return null;
+    }
+    try {
+      const input: CreateProductInput = {
+        ...state.listingDraft,
+        sellerId: activeUser.id,
+        storeId: activeStore.id,
       };
-
+      //↑認証処理できたらinput消す
+      const product = await createProduct(input);
       setState((current) => ({
         ...current,
-        products: current.products.map((item) =>
-          item.id === product.id
-            ? { ...item, stock: Math.max(0, item.stock - 1) }
-            : item,
-        ),
-        transactions: [transaction, ...current.transactions],
+        products: [product, ...current.products],
+        listingDraft: null,
       }));
-      return { ok: true, transactionId: transaction.id };
+      return product;
+    } catch (error) {
+      console.error('❌ 出品APIでエラー:', error); //後で別のエラー処理
+      return null;
+    }
+  }, [activeStore.id, activeUser.id, state.listingDraft]);
+
+  // 商品購入
+  const purchaseProduct = useCallback(
+    async (productId: string, requestId: string): Promise<PurchaseResult> => {
+      try {
+        const result = await purchaseProductApi(
+          productId,
+          activeUser.id,
+          requestId,
+        );
+        return result;
+      } catch (error) {
+        console.error('❌ Provider: 購入APIでエラー:', error); //後で別のエラー処理
+        return {
+          ok: false,
+          error: '商品の購入に失敗しました。',
+        };
+      }
     },
-    [activeUser.id, state.products],
+    [activeUser.id],
   );
 
   const value = useMemo(
