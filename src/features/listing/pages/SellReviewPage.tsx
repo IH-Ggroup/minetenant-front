@@ -25,7 +25,7 @@ export function SellReviewPage() {
       return;
     }
 
-    getStore(activeUser.storeId)
+    getStore(activeUser.storeId) //getStore
       .then(setStore)
       .catch(() => {
         setError('店舗情報を取得できませんでした。');

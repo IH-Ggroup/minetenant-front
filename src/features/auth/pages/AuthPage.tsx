@@ -11,10 +11,10 @@ export function AuthPage() {
   const { login } = useDemoStore();
   const isSignup = location.pathname === paths.signup;
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    login();
-    navigate(paths.products);
+
+    await login();
     navigate(paths.products);
   };
 

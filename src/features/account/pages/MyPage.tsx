@@ -44,7 +44,7 @@ export function MyPage() {
         // 取引に紐づく商品情報を取得
         const productEntries = await Promise.all(
           sortedTransactions.map(async (transaction) => {
-            const product = await getProduct(transaction.productId);
+            const product = await getProduct(transaction.productId); //メモ
 
             return [transaction.productId, product] as const;
           }),
