@@ -1,17 +1,39 @@
 import { ArrowLeft, Package } from 'lucide-react';
 import { Link, useParams } from 'react-router-dom';
+import { useEffect, useState } from 'react';
 
+import { getProduct, getStore } from '@/api/products';
 import { useDemoStore } from '@/app/demo-store-context';
 import { paths } from '@/app/paths';
 import { formatPrice } from '@/shared/lib/format';
 import { ButtonLink } from '@/shared/ui/Button';
 import { EmptyState } from '@/shared/ui/EmptyState';
 import { ProductVisual } from '@/shared/ui/ProductVisual';
+import type { Product, Store } from '@/domain/models';
 
 export function ProductDetailPage() {
   const { productId = '' } = useParams();
-  const { state, activeUser } = useDemoStore();
-  const product = state.products.find((item) => item.id === productId);
+  const { activeUser } = useDemoStore();
+
+  const [product, setProduct] = useState<Product | null>(null);
+  const [store, setStore] = useState<Store | null>(null);
+
+  useEffect(() => {
+    if (!productId) return;
+
+    getProduct(productId)
+      .then((product) => {
+        setProduct(product);
+
+        return getStore(product.storeId);
+      })
+      .then((store) => {
+        setStore(store);
+      })
+      .catch((error) => {
+        console.error('商品詳細取得×', error);
+      });
+  }, [productId]);
 
   if (!product) {
     return (
@@ -24,9 +46,9 @@ export function ProductDetailPage() {
     );
   }
 
-  const store = state.stores.find((item) => item.id === product.storeId);
   const isSoldOut = product.stock === 0;
-  const isOwnProduct = product.sellerId === activeUser.id;
+  const isOwnProduct =
+    activeUser !== null && product.sellerId === activeUser.id;
 
   return (
     <div className="page-stack">

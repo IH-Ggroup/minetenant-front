@@ -78,3 +78,24 @@ export interface PurchaseResult {
   error?: string;
   transactionId?: string;
 }
+
+// 追加
+export interface StoreDashboardStats {
+  productCount: number;
+  availableProductCount: number;
+  soldOutProductCount: number;
+  totalStock: number;
+  salesCount: number;
+  salesAmount: number;
+  webSalesCount: number;
+  minecraftSalesCount: number;
+  nextLevelPoints: number;
+  levelProgressPercent: number;
+}
+
+export interface StoreDashboard {
+  store: Store;
+  products: Product[];
+  stats: StoreDashboardStats;
+  recentTransactions: Transaction[];
+}

@@ -1,8 +1,10 @@
 import { ArrowRight, Info, Package } from 'lucide-react';
+import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 
-import { useDemoStore } from '@/app/demo-store-context';
+import { getProduct } from '@/api/products';
 import { paths } from '@/app/paths';
+import type { Product } from '@/domain/models';
 import { ButtonLink } from '@/shared/ui/Button';
 import { EmptyState } from '@/shared/ui/EmptyState';
 import { StepIndicator } from '@/shared/ui/StepIndicator';
@@ -10,8 +12,19 @@ import { SyncFlow } from '@/shared/ui/SyncFlow';
 
 export function SellSyncPage() {
   const { productId = '' } = useParams();
-  const { state } = useDemoStore();
-  const product = state.products.find((item) => item.id === productId);
+  const [product, setProduct] = useState<Product | null>(null);
+
+  useEffect(() => {
+    if (!productId) {
+      return;
+    }
+    // DB保存のタイミングによりこの処理が変わる
+    getProduct(productId)
+      .then(setProduct)
+      .catch(() => {
+        setProduct(null);
+      });
+  }, [productId]);
 
   if (!product) {
     return (

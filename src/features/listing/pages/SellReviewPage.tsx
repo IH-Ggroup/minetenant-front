@@ -1,9 +1,11 @@
 import { ArrowLeft, ArrowRight, PackageCheck } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+import { createProduct, getStore } from '@/api/products';
 import { useDemoStore } from '@/app/demo-store-context';
 import { paths } from '@/app/paths';
+import type { Store } from '@/domain/models';
 import { categoryLabels, formatPrice } from '@/shared/lib/format';
 import { Button, ButtonLink } from '@/shared/ui/Button';
 import { EmptyState } from '@/shared/ui/EmptyState';
@@ -11,9 +13,24 @@ import { StepIndicator } from '@/shared/ui/StepIndicator';
 
 export function SellReviewPage() {
   const navigate = useNavigate();
-  const { state, activeStore, publishListing } = useDemoStore();
+  const { activeUser, listingDraft } = useDemoStore();
+
+  const [store, setStore] = useState<Store | null>(null);
   const [error, setError] = useState('');
-  const draft = state.listingDraft;
+
+  const draft = listingDraft;
+
+  useEffect(() => {
+    if (!activeUser) {
+      return;
+    }
+
+    getStore(activeUser.storeId)
+      .then(setStore)
+      .catch(() => {
+        setError('店舗情報を取得できませんでした。');
+      });
+  }, [activeUser]);
 
   if (!draft) {
     return (
@@ -27,12 +44,12 @@ export function SellReviewPage() {
   }
 
   const handlePublish = async () => {
-    const product = await publishListing();
-    if (!product) {
+    try {
+      const product = await createProduct(draft);
+      navigate(paths.sellSync(product.id));
+    } catch {
       setError('出品情報を保存できませんでした。');
-      return;
     }
-    navigate(paths.sellSync(product.id));
   };
 
   return (
@@ -54,25 +71,30 @@ export function SellReviewPage() {
             <dt>商品名</dt>
             <dd>{draft.name}</dd>
           </div>
+
           <div>
             <dt>商品説明</dt>
             <dd>{draft.description}</dd>
           </div>
+
           <div>
             <dt>価格</dt>
             <dd>{formatPrice(draft.price)}</dd>
           </div>
+
           <div>
             <dt>在庫数</dt>
             <dd>{draft.stock}点</dd>
           </div>
+
           <div>
             <dt>カテゴリ</dt>
             <dd>{categoryLabels[draft.category]}</dd>
           </div>
+
           <div>
             <dt>出品店舗</dt>
-            <dd>{activeStore.name}</dd>
+            <dd>{store?.name ?? '店舗情報を取得中...'}</dd>
           </div>
         </dl>
 
@@ -87,6 +109,7 @@ export function SellReviewPage() {
             <ArrowLeft size={16} aria-hidden="true" />
             修正する
           </ButtonLink>
+
           <Button type="button" onClick={handlePublish}>
             出品する
             <ArrowRight size={18} aria-hidden="true" />

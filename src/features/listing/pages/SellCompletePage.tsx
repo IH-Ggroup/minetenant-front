@@ -1,8 +1,10 @@
 import { CheckCircle2, PackagePlus } from 'lucide-react';
+import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 
-import { useDemoStore } from '@/app/demo-store-context';
+import { getProduct } from '@/api/products';
 import { paths } from '@/app/paths';
+import type { Product } from '@/domain/models';
 import { formatPrice } from '@/shared/lib/format';
 import { ButtonLink } from '@/shared/ui/Button';
 import { EmptyState } from '@/shared/ui/EmptyState';
@@ -10,8 +12,19 @@ import { StepIndicator } from '@/shared/ui/StepIndicator';
 
 export function SellCompletePage() {
   const { productId = '' } = useParams();
-  const { state } = useDemoStore();
-  const product = state.products.find((item) => item.id === productId);
+  const [product, setProduct] = useState<Product | null>(null);
+
+  useEffect(() => {
+    if (!productId) {
+      return;
+    }
+
+    getProduct(productId)
+      .then(setProduct)
+      .catch(() => {
+        setProduct(null);
+      });
+  }, [productId]);
 
   if (!product) {
     return (

@@ -20,29 +20,36 @@ interface ListingFormState {
 
 export function SellPage() {
   const navigate = useNavigate();
-  const { state, activeUser, activeStore, saveListingDraft } = useDemoStore();
-  const draft = state.listingDraft;
+  const { activeUser, saveListingDraft } = useDemoStore();
+
   const [form, setForm] = useState<ListingFormState>({
-    name: draft?.name ?? '',
-    description: draft?.description ?? '',
-    price: draft ? String(draft.price) : '',
-    stock: draft ? String(draft.stock) : '1',
-    category: draft?.category ?? 'fashion',
+    name: '',
+    description: '',
+    price: '',
+    stock: '1',
+    category: 'fashion',
   });
 
   const updateField = <Key extends keyof ListingFormState>(
     key: Key,
     value: ListingFormState[Key],
   ) => {
-    setForm((current) => ({ ...current, [key]: value }));
+    setForm((current) => ({
+      ...current,
+      [key]: value,
+    }));
   };
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
+    if (!activeUser) {
+      return;
+    }
+
     saveListingDraft({
-      sellerId: activeUser.id, //認証処理完了まで一時的に入れる
-      storeId: activeStore.id, //認証処理完了まで一時的に入れる
+      sellerId: activeUser.id,
+      storeId: activeUser.storeId,
       name: form.name.trim(),
       description: form.description.trim(),
       price: Number(form.price),

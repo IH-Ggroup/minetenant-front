@@ -1,27 +1,41 @@
 import { PackageSearch, Plus, Search } from 'lucide-react';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
-import { useDemoStore } from '@/app/demo-store-context';
+import { getProducts } from '@/api/products';
+// import { useDemoStore } from '@/app/demo-store-context';
 import { paths } from '@/app/paths';
 import { ProductCard } from '@/features/catalog/components/ProductCard';
 import { ButtonLink } from '@/shared/ui/Button';
 import { EmptyState } from '@/shared/ui/EmptyState';
 import { PageHeader } from '@/shared/ui/PageHeader';
+import type { Product } from '@/domain/models';
 
 export function ProductListPage() {
-  const { state } = useDemoStore();
+  // const { activeUser } = useDemoStore();
+
+  const [products, setProducts] = useState<Product[]>([]);
   const [query, setQuery] = useState('');
+
+  useEffect(() => {
+    getProducts()
+      .then((products) => {
+        setProducts(products);
+      })
+      .catch((error) => {
+        console.error('商品取得×', error);
+      });
+  }, []);
 
   const filteredProducts = useMemo(() => {
     const normalizedQuery = query.trim().toLocaleLowerCase('ja');
-    return state.products.filter(
+
+    return products.filter(
       (product) =>
         !normalizedQuery ||
         product.name.toLocaleLowerCase('ja').includes(normalizedQuery) ||
         product.description.toLocaleLowerCase('ja').includes(normalizedQuery),
     );
-  }, [query, state.products]);
-
+  }, [query, products]);
   return (
     <div className="page-stack">
       <PageHeader
@@ -54,9 +68,9 @@ export function ProductListPage() {
             <ProductCard
               key={product.id}
               product={product}
-              store={state.stores.find((store) => store.id === product.storeId)}
-              //取得した商品情報の中の店舗IDでstate.stores(店舗名含む情報入ってる)から店舗名探してる
-              // 店舗情報一括取得から既存のfind
+              // store={state.stores.find((store) => store.id === product.storeId)}
+              // <p className="product-card__store">{store?.name ?? '店舗情報なし'}</p>
+              // バックエンドで店舗名取得できるならproduct.name表示する商品の分全件店舗情報getProducts(storeId?: string)
             />
           ))}
         </section>

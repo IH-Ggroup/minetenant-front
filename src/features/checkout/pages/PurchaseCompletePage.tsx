@@ -1,8 +1,11 @@
 import { ArrowRight, CheckCircle2, Package, UserRound } from 'lucide-react';
+import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 
+import { getProduct, getTransactions } from '@/api/products';
 import { useDemoStore } from '@/app/demo-store-context';
 import { paths } from '@/app/paths';
+import type { Product, Transaction } from '@/domain/models';
 import { formatPrice } from '@/shared/lib/format';
 import { ButtonLink } from '@/shared/ui/Button';
 import { EmptyState } from '@/shared/ui/EmptyState';
@@ -11,21 +14,79 @@ import { StepIndicator } from '@/shared/ui/StepIndicator';
 
 export function PurchaseCompletePage() {
   const { transactionId = '' } = useParams();
-  const { state } = useDemoStore();
-  const transaction = state.transactions.find(
-    (item) => item.id === transactionId,
-  );
-  const product = state.products.find(
-    (item) => item.id === transaction?.productId,
-  );
+  const { activeUser } = useDemoStore();
 
-  if (!transaction || !product) {
+  const [transaction, setTransaction] = useState<Transaction | null>(null);
+  const [product, setProduct] = useState<Product | null>(null);
+  // const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    if (!transactionId || !activeUser) {
+      // setIsLoading(false);
+      return;
+    }
+
+    const loadPurchaseResult = async () => {
+      try {
+        // setIsLoading(true);
+        setError('');
+
+        // ユーザーに関係する取引を取得
+        const transactions = await getTransactions(activeUser.id);
+
+        // 今回購入した取引をtransactionIdから特定
+        const currentTransaction = transactions.find(
+          (item) => item.id === transactionId,
+        );
+
+        if (!currentTransaction) {
+          setError('購入した取引が見つかりません。');
+          return;
+        }
+
+        setTransaction(currentTransaction);
+
+        // 取引に紐づく商品を取得
+        const currentProduct = await getProduct(currentTransaction.productId);
+
+        setProduct(currentProduct);
+      } catch (error) {
+        console.error('❌ 購入結果の取得エラー:', error);
+        setError('購入結果の取得に失敗しました。');
+      } finally {
+        // setIsLoading(false);
+      }
+    };
+
+    loadPurchaseResult();
+  }, [transactionId, activeUser]);
+
+  // API取得中
+  // if (isLoading) {
+  //   return <div>購入結果を読み込み中...</div>;
+  // }
+
+  // ログインしていない
+  if (!activeUser) {
+    return (
+      <EmptyState
+        icon={<Package size={32} />}
+        title="ログインが必要です"
+        description="購入結果を確認するにはログインしてください。"
+        action={<ButtonLink to={paths.products}>商品一覧へ</ButtonLink>}
+      />
+    );
+  }
+
+  // API取得失敗
+  if (error || !transaction || !product) {
     return (
       <EmptyState
         icon={<Package size={32} />}
         title="購入結果が見つかりません"
-        description="商品一覧からもう一度操作してください。"
-        action={<ButtonLink to={paths.products}>商品一覧へ</ButtonLink>}
+        description={error || '購入結果を取得できませんでした。'}
+        action={<ButtonLink to={paths.products}>商品一覧へ戻る</ButtonLink>}
       />
     );
   }
@@ -53,10 +114,12 @@ export function PurchaseCompletePage() {
             name={product.name}
             compact
           />
+
           <div>
             <h2>{product.name}</h2>
             <p>{formatPrice(transaction.amount)}</p>
           </div>
+
           <span>在庫 {product.stock}点</span>
         </div>
       </section>
@@ -65,6 +128,7 @@ export function PurchaseCompletePage() {
         <ButtonLink to={paths.myPage} leadingIcon={<UserRound size={18} />}>
           マイページへ
         </ButtonLink>
+
         <ButtonLink
           to={paths.products}
           variant="secondary"

@@ -1,7 +1,10 @@
 import { PackagePlus, ReceiptText } from 'lucide-react';
+import { useEffect, useState } from 'react';
 
+import { getProduct, getTransactions } from '@/api/products';
 import { useDemoStore } from '@/app/demo-store-context';
 import { paths } from '@/app/paths';
+import type { Product, Transaction } from '@/domain/models';
 import {
   formatDateTime,
   formatPrice,
@@ -12,14 +15,63 @@ import { ButtonLink } from '@/shared/ui/Button';
 import { PageHeader } from '@/shared/ui/PageHeader';
 
 export function MyPage() {
-  const { state, activeUser, activeStore } = useDemoStore();
-  const transactions = state.transactions
-    .filter(
-      (transaction) =>
-        transaction.buyerId === activeUser.id ||
-        transaction.sellerId === activeUser.id,
-    )
-    .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+  const { activeUser } = useDemoStore();
+
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [products, setProducts] = useState<Record<string, Product>>({});
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    if (!activeUser) {
+      setIsLoading(false);
+      return;
+    }
+
+    const loadTransactions = async () => {
+      try {
+        setIsLoading(true);
+
+        // ログインユーザーに関係する取引を取得
+        const transactionData = await getTransactions(activeUser.id);
+
+        // 新しい順に並べる
+        const sortedTransactions = [...transactionData].sort((a, b) =>
+          b.createdAt.localeCompare(a.createdAt),
+        );
+
+        setTransactions(sortedTransactions);
+
+        // 取引に紐づく商品情報を取得
+        const productEntries = await Promise.all(
+          sortedTransactions.map(async (transaction) => {
+            const product = await getProduct(transaction.productId);
+
+            return [transaction.productId, product] as const;
+          }),
+        );
+
+        setProducts(Object.fromEntries(productEntries));
+      } catch (error) {
+        console.error('❌ 取引履歴の取得エラー:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadTransactions();
+  }, [activeUser]);
+
+  if (!activeUser) {
+    return (
+      <div className="page-stack">
+        <PageHeader
+          title="マイページ"
+          description="マイページを利用するにはログインしてください。"
+        />
+        <ButtonLink to={paths.login}>ログインする</ButtonLink>
+      </div>
+    );
+  }
 
   return (
     <div className="page-stack">
@@ -39,15 +91,17 @@ export function MyPage() {
             <h2>{activeUser.name}</h2>
             <p>{activeUser.roleLabel}</p>
           </div>
+
           <ButtonLink to={paths.login} variant="secondary">
             ユーザーを切り替える
           </ButtonLink>
         </div>
 
         <div className="review-actions">
-          <ButtonLink to={paths.store(activeStore.id)} variant="secondary">
+          <ButtonLink to={paths.store(activeUser.storeId)} variant="secondary">
             店舗ページを見る
           </ButtonLink>
+
           <ButtonLink to={paths.storeManage} variant="secondary">
             店舗を管理する
           </ButtonLink>
@@ -60,7 +114,11 @@ export function MyPage() {
           <Badge tone="neutral">{transactions.length}件</Badge>
         </div>
 
-        {transactions.length === 0 ? (
+        {isLoading ? (
+          <div className="compact-empty">
+            <p>取引履歴を読み込み中...</p>
+          </div>
+        ) : transactions.length === 0 ? (
           <div className="compact-empty">
             <ReceiptText size={25} aria-hidden="true" />
             <p>まだ取引はありません。</p>
@@ -68,22 +126,23 @@ export function MyPage() {
         ) : (
           <div className="transaction-list__rows">
             {transactions.map((transaction) => {
-              const product = state.products.find(
-                (item) => item.id === transaction.productId,
-              );
+              const product = products[transaction.productId];
 
               return (
                 <article key={transaction.id} className="transaction-row">
                   <span className="transaction-row__icon" aria-hidden="true">
                     <ReceiptText size={18} />
                   </span>
+
                   <span className="transaction-row__main">
                     <strong>{product?.name ?? '商品情報なし'}</strong>
                     <small>{formatDateTime(transaction.createdAt)}</small>
                   </span>
+
                   <span className="transaction-row__price">
                     {formatPrice(transaction.amount)}
                   </span>
+
                   <Badge tone="neutral">
                     {transactionStatusLabel(transaction.status)}
                   </Badge>

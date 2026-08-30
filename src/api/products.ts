@@ -4,85 +4,29 @@ import type {
   CreateProductInput,
   Store,
   Product,
+  Transaction,
+  StoreDashboard,
 } from '@/domain/models';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
-// 仮でユーザー情報取得(未使用)
-export async function users(
-  email: string,
-  password: string,
-): Promise<SessionUser> {
+export async function getuser(): Promise<SessionUser> {
   const response = await fetch(`${API_BASE_URL}/users`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      email,
-      password,
-    }),
+    method: 'GET',
   });
   if (!response.ok) {
-    throw new Error('ログインに失敗しました');
+    throw new Error('仮ユーザーの取得に失敗しました');
   }
   const json = await response.json();
-  return json.data;
-}
 
-/* login未使用 */
-export async function login(
-  email: string,
-  password: string,
-): Promise<SessionUser> {
-  const response = await fetch(`${API_BASE_URL}/auth/login`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      email,
-      password,
-    }),
-  });
-  if (!response.ok) {
-    throw new Error('ログインに失敗しました');
+  if (!json.data?.length) {
+    throw new Error('仮ユーザーが見つかりません');
   }
-  return response.json() as Promise<SessionUser>;
+
+  return json.data[0];
 }
 
-/* register未使用 */
-export async function register(
-  email: string,
-  password: string,
-): Promise<SessionUser> {
-  const response = await fetch(`${API_BASE_URL}/auth/register`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      email,
-      password,
-    }),
-  });
-  if (!response.ok) {
-    throw new Error('ユーザー登録に失敗しました。');
-  }
-  return response.json() as Promise<SessionUser>;
-}
-
-/* logout未使用 */
-export async function logout(): Promise<void> {
-  const response = await fetch(`${API_BASE_URL}/auth/logout`, {
-    method: 'POST',
-  });
-  if (!response.ok) {
-    throw new Error('ログアウトに失敗しました。');
-  }
-}
-
-/* 商品一覧を取得 後で店舗→店舗の商品一覧にも使う */
+/* 商品一覧を取得 */
 export async function getProducts(storeId?: string): Promise<Product[]> {
   const params = new URLSearchParams();
   if (storeId) {
@@ -121,19 +65,6 @@ export async function createProduct(
   return json.data;
 }
 
-/* 商品を削除未使用 */
-export async function deleteProduct(productId: string): Promise<void> {
-  const response = await fetch(
-    `${API_BASE_URL}/products/${encodeURIComponent(productId)}`,
-    {
-      method: 'DELETE',
-    },
-  );
-  if (!response.ok) {
-    throw new Error('商品の削除に失敗しました。');
-  }
-}
-
 /* 商品を購入  */
 export async function purchaseProduct(
   productId: string,
@@ -164,7 +95,7 @@ export async function purchaseProduct(
   };
 }
 
-/* 店舗情報を取得未使用 */
+/* 店舗情報を取得 */
 export async function getStore(storeId: string): Promise<Store> {
   const response = await fetch(
     `${API_BASE_URL}/stores/${encodeURIComponent(storeId)}`,
@@ -178,3 +109,53 @@ export async function getStore(storeId: string): Promise<Store> {
   const json = await response.json();
   return json.data;
 }
+
+/* 店舗集計未使用 */
+export async function getStoreDashboard(
+  storeId: string,
+): Promise<StoreDashboard> {
+  const response = await fetch(
+    `${API_BASE_URL}/stores/${encodeURIComponent(storeId)}/dashboard`,
+    {
+      method: 'GET',
+    },
+  );
+  if (!response.ok) {
+    throw new Error('店舗ダッシュボードの取得に失敗しました。');
+  }
+  const json = await response.json();
+  return json.data;
+}
+/* 商品詳細 */
+export async function getProduct(productId: string): Promise<Product> {
+  const response = await fetch(
+    `${API_BASE_URL}/products/${encodeURIComponent(productId)}`,
+    {
+      method: 'GET',
+    },
+  );
+
+  if (!response.ok) {
+    throw new Error('商品情報の取得に失敗しました。');
+  }
+
+  const json = await response.json();
+  return json.data;
+}
+
+/* 取引履歴を取得 */
+export async function getTransactions(userId: string): Promise<Transaction[]> {
+  const response = await fetch(
+    `${API_BASE_URL}/transactions?userId=${encodeURIComponent(userId)}`,
+    {
+      method: 'GET',
+    },
+  );
+  if (!response.ok) {
+    throw new Error('取引履歴の取得に失敗しました。');
+  }
+  const json = await response.json();
+  return json.data;
+}
+
+// API戻ってくる前の画面について(isLoadingなど調べる)
