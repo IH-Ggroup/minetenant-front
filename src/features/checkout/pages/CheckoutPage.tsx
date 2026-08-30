@@ -23,12 +23,12 @@ export function CheckoutPage() {
 
   const [product, setProduct] = useState<Product | null>(null);
 
+  const [isLoading, setIsLoading] = useState(true);
   const [draft, setDraft] = useState<CheckoutDraft>({
-    ...DEFAULT_CHECKOUT_DRAFT,
+    ...DEFAULT_CHECKOUT_DRAFT, //住所
     name: activeUser?.name ?? '',
   });
 
-  // 購入する商品を取得
   useEffect(() => {
     if (!productId) return;
 
@@ -36,17 +36,25 @@ export function CheckoutPage() {
       .then((product) => {
         setProduct(product);
       })
-      .catch((error) => {
-        console.error('商品取得×', error);
+      .finally(() => {
+        setIsLoading(false);
       });
   }, [productId]);
+
+  if (isLoading) {
+    return (
+      <div className="narrow-page page-stack">
+        <p>商品情報を読み込んでいます...</p>
+      </div>
+    );
+  }
 
   if (!product) {
     return (
       <EmptyState
         icon={<Package size={32} />}
-        title="購入する商品が見つかりません"
-        description="商品一覧から、購入する商品を選び直してください。"
+        title="商品情報を取得できませんでした"
+        description="商品一覧から、もう一度お試しください。"
         action={<ButtonLink to={paths.products}>商品一覧へ</ButtonLink>}
       />
     );

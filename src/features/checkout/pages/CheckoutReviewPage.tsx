@@ -28,6 +28,7 @@ export function CheckoutReviewPage() {
   const { activeUser } = useDemoStore();
   // 商品はAPIから取得
   const [product, setProduct] = useState<Product | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState('');
@@ -49,16 +50,24 @@ export function CheckoutReviewPage() {
       .then((product) => {
         setProduct(product);
       })
-      .catch((error) => {
-        console.error('商品取得×', error);
+      .finally(() => {
+        setIsLoading(false);
       });
   }, [productId]);
+
+  if (isLoading) {
+    return (
+      <div className="page-stack">
+        <p>商品情報を読み込んでいます...</p>
+      </div>
+    );
+  }
 
   if (!product) {
     return (
       <EmptyState
         icon={<Package size={32} />}
-        title="確認する商品が見つかりません"
+        title="商品情報を取得できませんでした"
         description="商品一覧へ戻って、もう一度お試しください。"
         action={<ButtonLink to={paths.products}>商品一覧へ</ButtonLink>}
       />
@@ -82,18 +91,13 @@ export function CheckoutReviewPage() {
         activeUser.id,
         requestId,
       );
-
-      // 購入APIの実際の戻り値を確認する
-      console.log('🛒 購入APIレスポンス:', result);
-
       if (result.ok && result.transactionId) {
         navigate(paths.purchaseComplete(result.transactionId));
         return;
       }
 
       setError(result.error ?? '購入処理に失敗しました。');
-    } catch (error) {
-      console.error('❌ 購入処理エラー:', error);
+    } catch {
       setError('購入処理に失敗しました。');
     } finally {
       setIsProcessing(false);

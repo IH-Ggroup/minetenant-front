@@ -18,20 +18,15 @@ export function PurchaseCompletePage() {
 
   const [transaction, setTransaction] = useState<Transaction | null>(null);
   const [product, setProduct] = useState<Product | null>(null);
-  // const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     if (!transactionId || !activeUser) {
-      // setIsLoading(false);
       return;
     }
 
     const loadPurchaseResult = async () => {
       try {
-        // setIsLoading(true);
-        setError('');
-
         // ユーザーに関係する取引を取得
         const transactions = await getTransactions(activeUser.id);
 
@@ -41,21 +36,16 @@ export function PurchaseCompletePage() {
         );
 
         if (!currentTransaction) {
-          setError('購入した取引が見つかりません。');
           return;
         }
 
         setTransaction(currentTransaction);
 
-        // 取引に紐づく商品を取得
         const currentProduct = await getProduct(currentTransaction.productId);
 
         setProduct(currentProduct);
-      } catch (error) {
-        console.error('❌ 購入結果の取得エラー:', error);
-        setError('購入結果の取得に失敗しました。');
       } finally {
-        // setIsLoading(false);
+        setIsLoading(false);
       }
     };
 
@@ -63,9 +53,13 @@ export function PurchaseCompletePage() {
   }, [transactionId, activeUser]);
 
   // API取得中
-  // if (isLoading) {
-  //   return <div>購入結果を読み込み中...</div>;
-  // }
+  if (isLoading) {
+    return (
+      <div className="narrow-page page-stack">
+        <p>購入結果を読み込んでいます...</p>
+      </div>
+    );
+  }
 
   // ログインしていない
   if (!activeUser) {
@@ -80,12 +74,12 @@ export function PurchaseCompletePage() {
   }
 
   // API取得失敗
-  if (error || !transaction || !product) {
+  if (!transaction || !product) {
     return (
       <EmptyState
         icon={<Package size={32} />}
         title="購入結果が見つかりません"
-        description={error || '購入結果を取得できませんでした。'}
+        description="購入結果を取得できませんでした。"
         action={<ButtonLink to={paths.products}>商品一覧へ戻る</ButtonLink>}
       />
     );

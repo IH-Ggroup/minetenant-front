@@ -157,5 +157,3 @@ export async function getTransactions(userId: string): Promise<Transaction[]> {
   const json = await response.json();
   return json.data;
 }
-
-// API戻ってくる前の画面について(isLoadingなど調べる)

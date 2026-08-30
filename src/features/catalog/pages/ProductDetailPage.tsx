@@ -17,6 +17,7 @@ export function ProductDetailPage() {
 
   const [product, setProduct] = useState<Product | null>(null);
   const [store, setStore] = useState<Store | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     if (!productId) return;
@@ -30,17 +31,21 @@ export function ProductDetailPage() {
       .then((store) => {
         setStore(store);
       })
-      .catch((error) => {
-        console.error('商品詳細取得×', error);
+      .finally(() => {
+        setIsLoading(false);
       });
   }, [productId]);
+
+  if (isLoading) {
+    return <div className="page-stack">商品を読み込んでいます...</div>;
+  }
 
   if (!product) {
     return (
       <EmptyState
         icon={<Package size={32} />}
-        title="商品が見つかりません"
-        description="URLが正しいか確認するか、商品一覧から選び直してください。"
+        title="商品情報を取得できませんでした"
+        description="時間をおいて、もう一度お試しください。"
         action={<ButtonLink to={paths.products}>商品一覧へ戻る</ButtonLink>}
       />
     );

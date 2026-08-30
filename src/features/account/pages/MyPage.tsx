@@ -20,10 +20,10 @@ export function MyPage() {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [products, setProducts] = useState<Record<string, Product>>({});
   const [isLoading, setIsLoading] = useState(true);
+  const [isError, setIsError] = useState(false);
 
   useEffect(() => {
     if (!activeUser) {
-      setIsLoading(false);
       return;
     }
 
@@ -51,8 +51,8 @@ export function MyPage() {
         );
 
         setProducts(Object.fromEntries(productEntries));
-      } catch (error) {
-        console.error('❌ 取引履歴の取得エラー:', error);
+      } catch {
+        setIsError(true);
       } finally {
         setIsLoading(false);
       }
@@ -117,6 +117,11 @@ export function MyPage() {
         {isLoading ? (
           <div className="compact-empty">
             <p>取引履歴を読み込み中...</p>
+          </div>
+        ) : isError ? (
+          <div className="compact-empty">
+            <ReceiptText size={25} aria-hidden="true" />
+            <p>取引履歴を取得できませんでした。</p>
           </div>
         ) : transactions.length === 0 ? (
           <div className="compact-empty">

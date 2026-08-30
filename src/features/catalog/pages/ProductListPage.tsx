@@ -15,14 +15,19 @@ export function ProductListPage() {
 
   const [products, setProducts] = useState<Product[]>([]);
   const [query, setQuery] = useState('');
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     getProducts()
       .then((products) => {
         setProducts(products);
       })
-      .catch((error) => {
-        console.error('商品取得×', error);
+      .catch(() => {
+        setProducts([]);
+      })
+
+      .finally(() => {
+        setIsLoading(false);
       });
   }, []);
 
@@ -36,6 +41,26 @@ export function ProductListPage() {
         product.description.toLocaleLowerCase('ja').includes(normalizedQuery),
     );
   }, [query, products]);
+  if (isLoading) {
+    return (
+      <div className="page-stack">
+        <PageHeader
+          title="商品を探す"
+          description="商品名から出品中の商品を検索できます。"
+          actions={
+            <ButtonLink to={paths.sell} leadingIcon={<Plus size={18} />}>
+              商品を出品
+            </ButtonLink>
+          }
+        />
+
+        <div role="status" aria-live="polite">
+          商品を読み込んでいます...
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="page-stack">
       <PageHeader
