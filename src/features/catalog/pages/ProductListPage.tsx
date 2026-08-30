@@ -94,8 +94,6 @@ export function ProductListPage() {
               key={product.id}
               product={product}
               // store={state.stores.find((store) => store.id === product.storeId)}
-              // <p className="product-card__store">{store?.name ?? '店舗情報なし'}</p>
-              // バックエンドで店舗名取得できるならproduct.name表示する商品の分全件店舗情報getProducts(storeId?: string)
             />
           ))}
         </section>

@@ -18,7 +18,6 @@ export function SellSyncPage() {
     if (!productId) {
       return;
     }
-    // DB保存のタイミングによりこの処理が変わる
     getProduct(productId)
       .then(setProduct)
       .catch(() => {
