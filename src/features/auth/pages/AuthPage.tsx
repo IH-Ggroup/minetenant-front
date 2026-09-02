@@ -3,7 +3,6 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 
 import { useDemoStore } from '@/app/demo-store-context';
 import { paths } from '@/app/paths';
-import { DEMO_USERS } from '@/mocks/fixtures';
 import { Button } from '@/shared/ui/Button';
 
 export function AuthPage() {
@@ -12,9 +11,10 @@ export function AuthPage() {
   const { login } = useDemoStore();
   const isSignup = location.pathname === paths.signup;
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    login(DEMO_USERS[0].id);
+
+    await login();
     navigate(paths.products);
   };
 

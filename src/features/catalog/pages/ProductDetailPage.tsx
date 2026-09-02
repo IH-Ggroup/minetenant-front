@@ -1,32 +1,59 @@
 import { ArrowLeft, Package } from 'lucide-react';
 import { Link, useParams } from 'react-router-dom';
+import { useEffect, useState } from 'react';
 
+import { getProduct, getStore } from '@/api/products';
 import { useDemoStore } from '@/app/demo-store-context';
 import { paths } from '@/app/paths';
 import { formatPrice } from '@/shared/lib/format';
 import { ButtonLink } from '@/shared/ui/Button';
 import { EmptyState } from '@/shared/ui/EmptyState';
 import { ProductVisual } from '@/shared/ui/ProductVisual';
+import type { Product, Store } from '@/domain/models';
 
 export function ProductDetailPage() {
   const { productId = '' } = useParams();
-  const { state, activeUser } = useDemoStore();
-  const product = state.products.find((item) => item.id === productId);
+  const { activeUser } = useDemoStore();
+
+  const [product, setProduct] = useState<Product | null>(null);
+  const [store, setStore] = useState<Store | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    if (!productId) return;
+
+    getProduct(productId)
+      .then((product) => {
+        setProduct(product);
+
+        return getStore(product.storeId);
+      })
+      .then((store) => {
+        setStore(store);
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+  }, [productId]);
+
+  if (isLoading) {
+    return <div className="page-stack">商品を読み込んでいます...</div>;
+  }
 
   if (!product) {
     return (
       <EmptyState
         icon={<Package size={32} />}
-        title="商品が見つかりません"
-        description="URLが正しいか確認するか、商品一覧から選び直してください。"
+        title="商品情報を取得できませんでした"
+        description="時間をおいて、もう一度お試しください。"
         action={<ButtonLink to={paths.products}>商品一覧へ戻る</ButtonLink>}
       />
     );
   }
 
-  const store = state.stores.find((item) => item.id === product.storeId);
   const isSoldOut = product.stock === 0;
-  const isOwnProduct = product.sellerId === activeUser.id;
+  const isOwnProduct =
+    activeUser !== null && product.sellerId === activeUser.id;
 
   return (
     <div className="page-stack">

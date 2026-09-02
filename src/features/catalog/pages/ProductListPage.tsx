@@ -1,26 +1,65 @@
 import { PackageSearch, Plus, Search } from 'lucide-react';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
-import { useDemoStore } from '@/app/demo-store-context';
+import { getProducts } from '@/api/products';
+// import { useDemoStore } from '@/app/demo-store-context';
 import { paths } from '@/app/paths';
 import { ProductCard } from '@/features/catalog/components/ProductCard';
 import { ButtonLink } from '@/shared/ui/Button';
 import { EmptyState } from '@/shared/ui/EmptyState';
 import { PageHeader } from '@/shared/ui/PageHeader';
+import type { Product } from '@/domain/models';
 
 export function ProductListPage() {
-  const { state } = useDemoStore();
+  // const { activeUser } = useDemoStore();
+
+  const [products, setProducts] = useState<Product[]>([]);
   const [query, setQuery] = useState('');
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    getProducts()
+      .then((products) => {
+        setProducts(products);
+      })
+      .catch(() => {
+        setProducts([]);
+      })
+
+      .finally(() => {
+        setIsLoading(false);
+      });
+  }, []);
 
   const filteredProducts = useMemo(() => {
     const normalizedQuery = query.trim().toLocaleLowerCase('ja');
-    return state.products.filter(
+
+    return products.filter(
       (product) =>
         !normalizedQuery ||
         product.name.toLocaleLowerCase('ja').includes(normalizedQuery) ||
         product.description.toLocaleLowerCase('ja').includes(normalizedQuery),
     );
-  }, [query, state.products]);
+  }, [query, products]);
+  if (isLoading) {
+    return (
+      <div className="page-stack">
+        <PageHeader
+          title="商品を探す"
+          description="商品名から出品中の商品を検索できます。"
+          actions={
+            <ButtonLink to={paths.sell} leadingIcon={<Plus size={18} />}>
+              商品を出品
+            </ButtonLink>
+          }
+        />
+
+        <div role="status" aria-live="polite">
+          商品を読み込んでいます...
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="page-stack">
@@ -54,7 +93,7 @@ export function ProductListPage() {
             <ProductCard
               key={product.id}
               product={product}
-              store={state.stores.find((store) => store.id === product.storeId)}
+              // store={state.stores.find((store) => store.id === product.storeId)}
             />
           ))}
         </section>

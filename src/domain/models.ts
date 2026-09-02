@@ -53,6 +53,8 @@ export interface Transaction {
 }
 
 export interface CreateProductInput {
+  sellerId: string; //api一致用追加
+  storeId: string; //api一致用追加
   name: string;
   description: string;
   price: number;
@@ -75,4 +77,25 @@ export interface PurchaseResult {
   ok: boolean;
   error?: string;
   transactionId?: string;
+}
+
+// 追加
+export interface StoreDashboardStats {
+  productCount: number;
+  availableProductCount: number;
+  soldOutProductCount: number;
+  totalStock: number;
+  salesCount: number;
+  salesAmount: number;
+  webSalesCount: number;
+  minecraftSalesCount: number;
+  nextLevelPoints: number;
+  levelProgressPercent: number;
+}
+
+export interface StoreDashboard {
+  store: Store;
+  products: Product[];
+  stats: StoreDashboardStats;
+  recentTransactions: Transaction[];
 }

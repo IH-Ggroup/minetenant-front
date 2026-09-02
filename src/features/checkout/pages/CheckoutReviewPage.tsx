@@ -1,13 +1,19 @@
 import { ArrowLeft, Package } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
+
+import {
+  getProduct,
+  purchaseProduct as purchaseProductApi,
+} from '@/api/products';
 
 import { useDemoStore } from '@/app/demo-store-context';
 import { paths } from '@/app/paths';
 import {
   type CheckoutDraft,
   DEFAULT_CHECKOUT_DRAFT,
-} from '@/features/checkout/checkout-draft';
+} from '@/features/checkout/checkout-draft'; // 配送先情報を取得するAPIが未実装のため、既存のデモデータを使用
+import type { Product } from '@/domain/models';
 import { formatPrice } from '@/shared/lib/format';
 import { Button, ButtonLink } from '@/shared/ui/Button';
 import { EmptyState } from '@/shared/ui/EmptyState';
@@ -18,40 +24,84 @@ export function CheckoutReviewPage() {
   const { productId = '' } = useParams();
   const location = useLocation();
   const navigate = useNavigate();
-  const { state, purchaseProduct } = useDemoStore();
+
+  const { activeUser } = useDemoStore();
+  // 商品はAPIから取得
+  const [product, setProduct] = useState<Product | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState('');
-  const product = state.products.find((item) => item.id === productId);
+
+  // 購入ボタンを押した1回の操作につき1つ生成する
+  // 再送時は同じrequestIdを使用する
+  const [requestId] = useState(() => crypto.randomUUID());
+
+  // CheckoutPageから引き継いだ購入情報
   const checkoutDraft =
     (location.state as { checkoutDraft?: CheckoutDraft } | null | undefined)
       ?.checkoutDraft ?? DEFAULT_CHECKOUT_DRAFT;
+
+  // 商品詳細を取得
+  useEffect(() => {
+    if (!productId) return;
+
+    getProduct(productId)
+      .then((product) => {
+        setProduct(product);
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+  }, [productId]);
+
+  if (isLoading) {
+    return (
+      <div className="page-stack">
+        <p>商品情報を読み込んでいます...</p>
+      </div>
+    );
+  }
 
   if (!product) {
     return (
       <EmptyState
         icon={<Package size={32} />}
-        title="確認する商品が見つかりません"
+        title="商品情報を取得できませんでした"
         description="商品一覧へ戻って、もう一度お試しください。"
         action={<ButtonLink to={paths.products}>商品一覧へ</ButtonLink>}
       />
     );
   }
 
-  const handlePurchase = () => {
+  const handlePurchase = async () => {
+    if (!activeUser) {
+      setError('ログインしてください。');
+      return;
+    }
+
     if (isProcessing) return;
 
     setIsProcessing(true);
     setError('');
 
-    window.setTimeout(() => {
-      const result = purchaseProduct(product.id);
+    try {
+      const result = await purchaseProductApi(
+        product.id,
+        activeUser.id,
+        requestId,
+      );
       if (result.ok && result.transactionId) {
         navigate(paths.purchaseComplete(result.transactionId));
         return;
       }
+
       setError(result.error ?? '購入処理に失敗しました。');
+    } catch {
+      setError('購入処理に失敗しました。');
+    } finally {
       setIsProcessing(false);
-    }, 650);
+    }
   };
 
   return (
@@ -67,6 +117,7 @@ export function CheckoutReviewPage() {
           <ArrowLeft size={16} aria-hidden="true" />
           入力画面へ戻る
         </Link>
+
         <h1>購入内容の確認</h1>
       </div>
 
@@ -78,10 +129,12 @@ export function CheckoutReviewPage() {
             name={product.name}
             compact
           />
+
           <div>
             <h2>{product.name}</h2>
             <p>数量 1</p>
           </div>
+
           <strong>{formatPrice(product.price)}</strong>
         </div>
 
@@ -93,6 +146,7 @@ export function CheckoutReviewPage() {
               {checkoutDraft.address}
             </dd>
           </div>
+
           <div>
             <dt>支払い方法</dt>
             <dd>デモ決済</dd>
@@ -109,6 +163,7 @@ export function CheckoutReviewPage() {
           <ButtonLink to={paths.checkout(product.id)} variant="secondary">
             修正する
           </ButtonLink>
+
           <Button
             type="button"
             isLoading={isProcessing}

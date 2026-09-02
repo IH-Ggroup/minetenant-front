@@ -1,13 +1,15 @@
 import { ArrowLeft, CreditCard, Package } from 'lucide-react';
-import { type FormEvent, useState } from 'react';
+import { type FormEvent, useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 
+import { getProduct } from '@/api/products';
 import { useDemoStore } from '@/app/demo-store-context';
 import { paths } from '@/app/paths';
 import {
   type CheckoutDraft,
   DEFAULT_CHECKOUT_DRAFT,
 } from '@/features/checkout/checkout-draft';
+import type { Product } from '@/domain/models';
 import { formatPrice } from '@/shared/lib/format';
 import { Button, ButtonLink } from '@/shared/ui/Button';
 import { EmptyState } from '@/shared/ui/EmptyState';
@@ -17,30 +19,55 @@ import { StepIndicator } from '@/shared/ui/StepIndicator';
 export function CheckoutPage() {
   const { productId = '' } = useParams();
   const navigate = useNavigate();
-  const { state, activeUser } = useDemoStore();
+  const { activeUser } = useDemoStore();
+
+  const [product, setProduct] = useState<Product | null>(null);
+
+  const [isLoading, setIsLoading] = useState(true);
   const [draft, setDraft] = useState<CheckoutDraft>({
-    ...DEFAULT_CHECKOUT_DRAFT,
-    name: activeUser.name,
+    ...DEFAULT_CHECKOUT_DRAFT, //住所
+    name: activeUser?.name ?? '',
   });
-  const product = state.products.find((item) => item.id === productId);
+
+  useEffect(() => {
+    if (!productId) return;
+
+    getProduct(productId)
+      .then((product) => {
+        setProduct(product);
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+  }, [productId]);
+
+  if (isLoading) {
+    return (
+      <div className="narrow-page page-stack">
+        <p>商品情報を読み込んでいます...</p>
+      </div>
+    );
+  }
 
   if (!product) {
     return (
       <EmptyState
         icon={<Package size={32} />}
-        title="購入する商品が見つかりません"
-        description="商品一覧から、購入する商品を選び直してください。"
+        title="商品情報を取得できませんでした"
+        description="商品一覧から、もう一度お試しください。"
         action={<ButtonLink to={paths.products}>商品一覧へ</ButtonLink>}
       />
     );
   }
 
   const cannotPurchase =
-    product.stock === 0 || product.sellerId === activeUser.id;
+    product.stock === 0 || product.sellerId === activeUser?.id;
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+
     if (cannotPurchase) return;
+
     navigate(paths.checkoutReview(product.id), {
       state: { checkoutDraft: draft },
     });
@@ -59,6 +86,7 @@ export function CheckoutPage() {
           <ArrowLeft size={16} aria-hidden="true" />
           商品詳細へ戻る
         </Link>
+
         <h1>購入情報</h1>
       </div>
 
@@ -84,6 +112,7 @@ export function CheckoutPage() {
                 required
               />
             </label>
+
             <label className="field">
               <span className="field__label">郵便番号</span>
               <input
@@ -101,6 +130,7 @@ export function CheckoutPage() {
               />
             </label>
           </div>
+
           <label className="field">
             <span className="field__label">住所</span>
             <input
@@ -122,11 +152,14 @@ export function CheckoutPage() {
           <div className="panel__heading">
             <h2>お支払い方法</h2>
           </div>
+
           <label className="payment-option">
             <input type="radio" name="payment" defaultChecked />
+
             <span className="payment-option__icon" aria-hidden="true">
               <CreditCard size={20} />
             </span>
+
             <span>
               <strong>デモ決済</strong>
             </span>
@@ -135,6 +168,7 @@ export function CheckoutPage() {
 
         <aside className="panel order-summary">
           <h2>注文内容</h2>
+
           <div className="order-summary__product">
             <ProductVisual
               theme={product.theme}
@@ -142,25 +176,30 @@ export function CheckoutPage() {
               name={product.name}
               compact
             />
+
             <div>
               <strong>{product.name}</strong>
               <span>数量 1</span>
             </div>
           </div>
+
           <dl>
             <div>
               <dt>商品</dt>
               <dd>{formatPrice(product.price)}</dd>
             </div>
+
             <div>
               <dt>送料</dt>
               <dd>デモのため無料</dd>
             </div>
+
             <div className="order-summary__total">
               <dt>合計</dt>
               <dd>{formatPrice(product.price)}</dd>
             </div>
           </dl>
+
           <Button type="submit" fullWidth disabled={cannotPurchase}>
             内容を確認する
           </Button>

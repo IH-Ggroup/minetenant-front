@@ -1,18 +1,38 @@
 import { PackagePlus } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useEffect, useState } from 'react';
 
+import { getStoreDashboard } from '@/api/products';
 import { useDemoStore } from '@/app/demo-store-context';
 import { paths } from '@/app/paths';
+import type { StoreDashboard } from '@/domain/models';
 import { formatPrice } from '@/shared/lib/format';
 import { Badge } from '@/shared/ui/Badge';
 import { ButtonLink } from '@/shared/ui/Button';
 import { PageHeader } from '@/shared/ui/PageHeader';
 
 export function StoreManagePage() {
-  const { state, activeStore } = useDemoStore();
-  const products = state.products.filter(
-    (product) => product.storeId === activeStore.id,
-  );
+  const { activeUser } = useDemoStore();
+  const [dashboard, setDashboard] = useState<StoreDashboard | null>(null);
+
+  useEffect(() => {
+    if (!activeUser) {
+      return;
+    }
+
+    getStoreDashboard(activeUser.storeId)
+      .then(setDashboard)
+      .catch((error) => {
+        console.error('店舗ダッシュボード取得×', error);
+        setDashboard(null);
+      });
+  }, [activeUser]);
+
+  if (!dashboard) {
+    return null;
+  }
+
+  const { store, products, stats } = dashboard;
 
   return (
     <div className="page-stack">
@@ -29,12 +49,12 @@ export function StoreManagePage() {
       <div className="management-grid">
         <section className="panel">
           <div className="panel__heading">
-            <h2>{activeStore.name}</h2>
-            <Badge tone="neutral">Lv.{activeStore.level}</Badge>
+            <h2>{store.name}</h2>
+            <Badge tone="neutral">Lv.{store.level}</Badge>
           </div>
-          <p>{activeStore.description}</p>
+          <p>{store.description}</p>
           <div className="form-actions">
-            <ButtonLink to={paths.store(activeStore.id)} variant="secondary">
+            <ButtonLink to={paths.store(store.id)} variant="secondary">
               公開ページを見る
             </ButtonLink>
           </div>
@@ -54,7 +74,7 @@ export function StoreManagePage() {
       <section className="panel inventory-panel">
         <div className="panel__heading">
           <h2>出品商品</h2>
-          <span>{products.length}件</span>
+          <span>{stats.productCount}件</span>
         </div>
 
         {products.length === 0 ? (
@@ -73,6 +93,7 @@ export function StoreManagePage() {
               <span role="columnheader">状態</span>
               <span role="columnheader">確認</span>
             </div>
+
             {products.map((product) => (
               <div className="inventory-table__row" role="row" key={product.id}>
                 <span className="inventory-table__product" role="cell">
@@ -81,12 +102,15 @@ export function StoreManagePage() {
                     <small>{formatPrice(product.price)}</small>
                   </span>
                 </span>
+
                 <strong role="cell">{product.stock}点</strong>
+
                 <span role="cell">
                   <Badge tone={product.stock > 0 ? 'success' : 'warning'}>
                     {product.stock > 0 ? '販売中' : '売り切れ'}
                   </Badge>
                 </span>
+
                 <span role="cell">
                   <Link to={paths.product(product.id)}>商品詳細</Link>
                 </span>

@@ -1,8 +1,10 @@
 import { ArrowLeft, PackageSearch, Store as StoreIcon } from 'lucide-react';
 import { Link, useParams } from 'react-router-dom';
+import { useEffect, useState } from 'react';
 
-import { useDemoStore } from '@/app/demo-store-context';
+import { getProducts, getStore } from '@/api/products';
 import { paths } from '@/app/paths';
+import type { Product, Store } from '@/domain/models';
 import { ProductCard } from '@/features/catalog/components/ProductCard';
 import { Badge } from '@/shared/ui/Badge';
 import { ButtonLink } from '@/shared/ui/Button';
@@ -11,8 +13,29 @@ import { PageHeader } from '@/shared/ui/PageHeader';
 
 export function StorePage() {
   const { storeId = '' } = useParams();
-  const { state } = useDemoStore();
-  const store = state.stores.find((item) => item.id === storeId);
+
+  const [store, setStore] = useState<Store | null>(null);
+  const [products, setProducts] = useState<Product[]>([]);
+
+  useEffect(() => {
+    if (!storeId) {
+      return;
+    }
+
+    getStore(storeId)
+      .then(setStore)
+      .catch((error) => {
+        console.error('店舗取得×', error);
+        setStore(null);
+      });
+
+    getProducts(storeId)
+      .then(setProducts)
+      .catch((error) => {
+        console.error('商品取得×', error);
+        setProducts([]);
+      });
+  }, [storeId]);
 
   if (!store) {
     return (
@@ -24,10 +47,6 @@ export function StorePage() {
       />
     );
   }
-
-  const products = state.products.filter(
-    (product) => product.storeId === store.id,
-  );
 
   return (
     <div className="page-stack">
