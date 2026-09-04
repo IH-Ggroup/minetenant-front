@@ -1,7 +1,19 @@
 import { fireEvent, screen } from '@testing-library/react';
-import { describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { getProducts, getuser } from '@/api/products';
+import { DEMO_USERS, INITIAL_PRODUCTS } from '@/mocks/fixtures';
 import { renderApp } from '@/test/render-app';
+
+// 画面遷移のテストなので API 境界を置き換えます。Laravel / MySQL は不要です。
+vi.mock('@/api/products');
+
+beforeEach(() => {
+  vi.mocked(getuser).mockResolvedValue({ ...DEMO_USERS[0] });
+  vi.mocked(getProducts).mockResolvedValue(
+    INITIAL_PRODUCTS.map((product) => ({ ...product })),
+  );
+});
 
 describe('MineTenant routes', () => {
   it('ログインボタンから商品一覧へ遷移できる', async () => {
@@ -15,6 +27,11 @@ describe('MineTenant routes', () => {
     expect(
       await screen.findByRole('heading', { name: '商品を探す' }),
     ).toBeInTheDocument();
+    expect(
+      await screen.findByRole('heading', { name: INITIAL_PRODUCTS[0].name }),
+    ).toBeInTheDocument();
+    expect(getuser).toHaveBeenCalledOnce();
+    expect(getProducts).toHaveBeenCalledOnce();
   });
 
   it('存在しないURLで次の操作が分かる404を表示する', async () => {

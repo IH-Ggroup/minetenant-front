@@ -31,20 +31,65 @@ Vite + React + TypeScript 製の土台です。
 API に保存した商品・取引データはバックエンド側に残ります。
 `src/mocks/fixtures.ts` は参考データであり、現在の画面のデータ取得元ではありません。
 
-## セットアップ
+## Docker を使わずに動かす
 
-推奨環境は Node.js 22、npm 10 以上です。
+フロントは Node.js、バックエンドは PHP + MySQL を PC に入れて動かします。
+Docker Desktop や旧 PoC のプロジェクトは不要です。
+
+### 初回だけ行うこと
+
+1. Node.js 22 系の 22.22.2 以降（推奨）と npm 10 以上をインストールします。
+   `node -v` と `npm -v` で確認できます。テスト用ライブラリも使うため、古い Node.js 22 では動きません。
+2. [バックエンドの README](https://github.com/IH-Ggroup/minetenant-backend#readme) に沿って、
+   PHP・Composer・MySQL と開発用 DB の初期設定を行います。
+3. このリポジトリのフォルダで、次のコマンドを実行します。
 
 ```bash
-npm install
-cp .env.example .env.local
-npm run dev
+npm ci
+npm run setup
 ```
 
-`.env.local` の `VITE_API_BASE_URL` は `http://localhost:8787/api/v1` が初期値です。
-Laravel API を別途 `localhost:8787` で起動してください。接続先が異なる場合はこの値を変更します。
+`npm run setup` は `.env.example` をコピーして `.env.local` を作成します。
+Windows / macOS / Linux 共通のコマンドです。既存の `.env.local` は上書きしません。
 
-フロントエンドは通常 [http://localhost:5173](http://localhost:5173) で起動します。
+接続先の初期値は次のとおりです。接続先を変えた場合は Vite を再起動してください。
+
+```env
+VITE_API_BASE_URL=http://localhost:8787/api/v1
+```
+
+### 開発するたびに行うこと
+
+起動する順番は **MySQL → Laravel → フロント** です。
+
+1. PC にインストールした MySQL を起動します（方法はバックエンドの README を参照）。
+2. ターミナルを開き、**バックエンドのフォルダ**で起動します。
+
+   ```bash
+   composer run dev
+   ```
+
+3. 別のターミナルを開き、**このフロントのフォルダ**で起動します。
+
+   ```bash
+   npm run dev
+   ```
+
+4. [http://localhost:5173](http://localhost:5173) をブラウザで開きます。
+
+Laravel と Vite のターミナルは開いたままにします。終了するときは、それぞれ `Ctrl + C` を押してください。
+フロントの設定に MySQL のパスワードは書きません。DB への接続は Laravel が担当します。
+
+### 起動に困ったとき
+
+- `Port 5173 is already in use`：既に起動しているフロントを終了してから再実行します。
+  API の接続設定とずれないよう、ポート番号は自動変更しません。
+- 商品取得に失敗する：MySQL と Laravel が起動しているか、`.env.local` の URL が正しいかを確認します。
+- `localhost` と `127.0.0.1` を混在させないでください。この手順では `localhost` に統一します。
+- 別の PC で使う場合も、その PC 上に上記の環境を用意します。この設定はインターネット公開用ではありません。
+
+なお、現在のフロントは仮ログインです。バックエンド側の本物の認証 API への接続は別の開発項目で、
+Docker を使わない起動設定だけでは対応しません。
 
 ## 品質確認
 
@@ -54,6 +99,9 @@ npm run typecheck
 npm run test
 npm run build
 ```
+
+`npm run test` はテスト用の API データを使うため、Laravel・MySQL を起動せず実行できます。
+これは画面遷移・セットアップ処理の確認です。実際の API との接続確認は、両方を起動して別途行います。
 
 ## 画面遷移
 
