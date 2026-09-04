@@ -1,135 +1,45 @@
+/* 配色や装飾は追加せず、読みやすい幅と余白だけを設定します。 */
 .app-shell {
-  min-height: 100vh;
-}
-
-.app-header {
-  background: var(--color-surface);
-  border-bottom: 1px solid var(--color-border);
+  max-width: 1040px;
+  margin-inline: auto;
 }
 
 .app-header__inner {
   display: flex;
-  width: min(100% - 48px, var(--content-width));
-  min-height: 64px;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-8);
-  margin-inline: auto;
-}
-
-.brand {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-2);
-  font-size: 1.05rem;
-}
-
-.brand__mark {
-  display: grid;
-  width: 34px;
-  height: 34px;
-  place-items: center;
-  color: white;
-  background: var(--color-primary);
-  border-radius: 4px;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 12px 32px;
 }
 
 .main-nav {
   display: flex;
-  align-items: stretch;
-  gap: var(--space-2);
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  margin-block: 8px;
 }
 
-.main-nav__link {
-  display: inline-flex;
-  min-height: 42px;
-  align-items: center;
-  padding-inline: var(--space-4);
-  color: var(--color-muted);
-  border-radius: 4px;
-  font-size: 0.92rem;
-  font-weight: 700;
-}
-
-.main-nav__link:hover,
 .main-nav__link.is-active {
-  color: var(--color-primary);
-  background: var(--color-primary-soft);
+  font-weight: bold;
 }
 
-.prototype-note {
-  padding: 9px 24px;
+.prototype-note,
+.auth-layout__description {
   color: var(--color-muted);
-  background: #f0f2f0;
-  border-bottom: 1px solid var(--color-border);
-  font-size: 0.8rem;
-  text-align: center;
+  font-size: 0.875rem;
 }
 
-.app-main {
-  width: min(100% - 48px, var(--content-width));
-  margin-inline: auto;
-  padding-block: var(--space-12);
-}
-
-.app-main:focus,
-.auth-layout:focus {
-  outline: none;
+.app-main,
+.auth-card {
+  margin-top: 32px;
 }
 
 .auth-layout {
-  display: grid;
-  width: min(100% - 32px, 460px);
-  min-height: 100vh;
-  align-content: center;
-  gap: var(--space-4);
-  margin-inline: auto;
-  padding-block: var(--space-8);
+  max-width: 440px;
+  margin: 32px auto;
 }
 
-.auth-layout__header {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--space-2);
-  font-size: 1.1rem;
-}
-
-.auth-layout__description {
-  color: var(--color-muted);
-  font-size: 0.9rem;
-  text-align: center;
-}
-
-@media (max-width: 640px) {
-  .app-header__inner {
-    width: min(100% - 32px, var(--content-width));
-    min-height: auto;
-    align-items: flex-start;
-    flex-direction: column;
-    gap: var(--space-3);
-    padding-block: var(--space-3);
-  }
-
-  .main-nav {
-    width: 100%;
-    overflow-x: auto;
-  }
-
-  .main-nav__link {
-    flex: 1;
-    justify-content: center;
-    padding-inline: var(--space-2);
-    white-space: nowrap;
-  }
-
-  .prototype-note {
-    padding-inline: var(--space-4);
-    text-align: left;
-  }
-
-  .app-main {
-    width: min(100% - 32px, var(--content-width));
-    padding-block: var(--space-8);
-  }
+/* 画面遷移時に本文へ移すフォーカスは、画面全体を囲まないようにします。 */
+.app-main:focus,
+.auth-layout:focus {
+  outline: none;
 }

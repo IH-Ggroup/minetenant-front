@@ -1,33 +1,9 @@
+/* デザイン担当が色・書体を決めるための最小限の初期値です。 */
 :root {
-  font-family:
-    Inter, 'Hiragino Sans', 'Yu Gothic UI', 'Yu Gothic', Meiryo, sans-serif;
-  color: #1f2925;
-  background: #f7f7f5;
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-
-  --color-text: #1f2925;
-  --color-muted: #68736d;
-  --color-border: #d8deda;
-  --color-surface: #ffffff;
-  --color-background: #f7f7f5;
-  --color-primary: #2f6b4f;
-  --color-primary-hover: #24563f;
-  --color-primary-soft: #eef5f1;
-  --color-warning: #8a5a16;
-  --color-warning-soft: #fff7e6;
-  --color-danger: #a73d43;
-  --color-danger-soft: #fff0f1;
-
-  --radius: 6px;
-  --space-1: 4px;
-  --space-2: 8px;
-  --space-3: 12px;
-  --space-4: 16px;
-  --space-6: 24px;
-  --space-8: 32px;
-  --space-12: 48px;
-
-  --content-width: 1120px;
-  --narrow-width: 820px;
+  font-family: sans-serif;
+  --color-text: #222;
+  --color-muted: #555;
+  --color-background: #fff;
+  --color-border: #aaa;
+  --color-link: #0000ee;
 }

@@ -1,4 +1,3 @@
-import { Box } from 'lucide-react';
 import { NavLink, Outlet } from 'react-router-dom';
 
 import { paths } from '@/app/paths';
@@ -20,9 +19,6 @@ export function AppLayout() {
       <header className="app-header">
         <div className="app-header__inner">
           <NavLink className="brand" to={paths.products}>
-            <span className="brand__mark" aria-hidden="true">
-              <Box size={18} />
-            </span>
             <strong>MineTenant</strong>
           </NavLink>
 
@@ -43,7 +39,7 @@ export function AppLayout() {
       </header>
 
       <p className="prototype-note">
-        画面遷移確認用のフロントエンド土台です。認証・決済・外部通信は行いません。
+        画面設計用の土台です。デザインはこれから作成します。
       </p>
 
       <main id="main-content" className="app-main" tabIndex={-1}>

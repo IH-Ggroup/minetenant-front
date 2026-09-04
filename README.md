@@ -1,7 +1,7 @@
 # MineTenant Frontend
 
-MineTenant の画面遷移を確認し、フロントエンド担当者がここから肉付けするための
-Vite + React + TypeScript 製ワイヤーフレーム土台です。
+MineTenant の画面遷移と API 連携を残し、デザイン担当者がここから見た目を作るための
+Vite + React + TypeScript 製の土台です。
 
 > 今回の Figma にある画面遷移図とワイヤーフレームを起点に新規作成しています。
 
@@ -9,23 +9,27 @@ Vite + React + TypeScript 製ワイヤーフレーム土台です。
 
 - 主要画面へ移動できる React Router の設定
 - 商品一覧、購入、出品、マイページ、店舗、取引の基本画面
-- 画面確認用の fixture と小さな Context
+- `src/api/products.ts` を通じた Laravel API への接続
+- 仮ログイン状態と出品下書きを持つ小さな Context
 - 入力フォームの最低限のバリデーション
-- PC・タブレット・スマートフォン向けの簡単な CSS
+- 操作に必要な余白・フォーム・現在地表示だけの最小限の CSS
 - 404、空状態、エラー境界
 
-見た目は完成デザインではありません。白・薄いグレー・緑一色を使い、
-配置と操作順が分かる程度に整えています。
+見た目は意図的に、ほぼ未装飾にしています。ブラウザ標準のボタン・リンクと縦並びを基本に、
+色、カード、画像枠、アニメーションなどの完成デザインは入れていません。
 
 ## この土台に含まないもの
 
 - 本物のログイン認証
-- バックエンド API
+- バックエンド本体（別途 Laravel API の起動が必要）
 - 決済、配送、画像アップロード
-- データの永続化（リロードすると初期状態へ戻ります）
+- 仮ログイン状態・出品下書きの永続化（リロードすると失われます）
 - Minecraft サーバーとの通信
 - 3D 店舗プレビュー
 - 完成版のコピー、アニメーション、デザイン
+
+API に保存した商品・取引データはバックエンド側に残ります。
+`src/mocks/fixtures.ts` は参考データであり、現在の画面のデータ取得元ではありません。
 
 ## セットアップ
 
@@ -33,10 +37,14 @@ Vite + React + TypeScript 製ワイヤーフレーム土台です。
 
 ```bash
 npm install
+cp .env.example .env.local
 npm run dev
 ```
 
-通常は <http://localhost:5173> で起動します。
+`.env.local` の `VITE_API_BASE_URL` は `http://localhost:8787/api/v1` が初期値です。
+Laravel API を別途 `localhost:8787` で起動してください。接続先が異なる場合はこの値を変更します。
+
+フロントエンドは通常 [http://localhost:5173](http://localhost:5173) で起動します。
 
 ## 品質確認
 
@@ -70,20 +78,26 @@ npm run build
 
 ```text
 src/
+├── api/          # Laravel API との通信
 ├── app/          # Router と簡易 Context
 ├── domain/       # 画面で使う型
 ├── features/     # 機能ごとのページ
 ├── layouts/      # 共通ヘッダー
-├── mocks/        # 画面確認用データ
+├── mocks/        # 参考データ（現在の取得元ではありません）
 └── shared/       # 共通 UI・CSS・表示関数
 ```
 
-## 肉付けするときに触る場所
+## デザインを作り始める場所
 
-- 画面を変更: `src/features/<機能名>/pages`
-- ルートを変更: `src/app/router.tsx` と `src/app/paths.ts`
-- 商品や店舗の仮データを変更: `src/mocks/fixtures.ts`
-- 共通ボタンや見出しを変更: `src/shared/ui`
-- 色や余白を変更: `src/shared/styles`
-- API を追加: `DemoStoreProvider` の処理をサービス層へ差し替える
-- Minecraft 表示を追加: `StoreManagePage` の「Minecraft店舗」予定枠へ実装する
+まずは `src/shared/styles` の CSS を編集してください。既存のクラス名をそのまま使えます。
+
+- `tokens.css`: 共通の色・書体などの初期値
+- `global.css`: 全体の文字・余白・フォーカス・読み上げ用表示
+- `layout.css`: 共通ヘッダー・ナビゲーション・本文の配置
+- `components.css`: ボタン・フォーム・手順・商品カードなどの共通部品
+- `pages.css`: 各画面の配置と在庫表
+
+必要なら画面の HTML 構造を `src/features/<機能名>/pages`、共通部品を `src/shared/ui` で調整します。
+デザイン作業では、API 呼び出し（`src/api/products.ts`）、フォームの入力・送信・検証処理、
+画面遷移（`src/app/router.tsx`・`src/app/paths.ts`）は変更しないでください。
+入力ラベル、エラー表示、無効状態、キーボードのフォーカス表示も残してください。

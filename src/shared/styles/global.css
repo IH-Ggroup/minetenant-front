@@ -1,170 +1,113 @@
+/* ブラウザ標準の見た目を基本に、読みやすさと操作性だけを補います。 */
 *,
 *::before,
 *::after {
   box-sizing: border-box;
 }
 
-html {
-  min-width: 320px;
-  min-height: 100%;
-}
-
 body {
-  min-width: 320px;
-  min-height: 100vh;
-  margin: 0;
+  margin: 24px;
   color: var(--color-text);
   background: var(--color-background);
   font-size: 16px;
-  line-height: 1.65;
+  line-height: 1.7;
+  overflow-wrap: anywhere;
 }
 
 button,
 input,
 textarea,
 select {
-  color: inherit;
+  max-width: 100%;
   font: inherit;
 }
 
 button {
-  border: 0;
+  cursor: pointer;
 }
 
 a {
-  color: inherit;
-  text-decoration: none;
-}
-
-img,
-svg {
-  display: block;
-}
-
-h1,
-h2,
-h3,
-p,
-dl,
-dd {
-  margin: 0;
+  color: var(--color-link);
+  text-decoration: underline;
 }
 
 h1 {
-  font-size: clamp(1.75rem, 4vw, 2rem);
-  line-height: 1.3;
+  font-size: 1.5rem;
 }
 
 h2 {
-  font-size: 1.25rem;
-  line-height: 1.4;
+  font-size: 1.125rem;
 }
 
 h3 {
   font-size: 1rem;
 }
 
-:focus-visible {
-  outline: 3px solid #8cc7ad;
-  outline-offset: 2px;
+h1,
+h2,
+h3,
+p {
+  margin: 12px 0;
 }
 
+img {
+  max-width: 100%;
+}
+
+svg {
+  vertical-align: middle;
+}
+
+:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 3px;
+}
+
+/* 読み上げ用ラベルは、見た目を簡素化しても残します。 */
 .sr-only {
-  position: absolute !important;
-  width: 1px !important;
-  height: 1px !important;
-  padding: 0 !important;
-  margin: -1px !important;
-  overflow: hidden !important;
-  clip: rect(0, 0, 0, 0) !important;
-  white-space: nowrap !important;
-  border: 0 !important;
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
 }
 
 .skip-link {
-  position: fixed;
-  z-index: 100;
-  top: 8px;
-  left: 8px;
-  padding: 8px 12px;
-  color: white;
-  background: var(--color-primary);
-  transform: translateY(-150%);
+  position: absolute;
+  left: -10000px;
 }
 
 .skip-link:focus {
-  transform: translateY(0);
+  position: static;
 }
 
-.page-stack {
-  display: grid;
-  gap: var(--space-8);
-}
-
-.narrow-page {
-  width: min(100%, var(--narrow-width));
-  margin-inline: auto;
-}
-
+/* 枠やカードは付けず、セクション間の余白だけを確保します。 */
+.page-stack > * + *,
 .panel {
-  padding: var(--space-6);
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius);
+  margin-top: 20px;
+}
+
+.panel__divider {
+  margin: 16px 0;
+  border-top: 1px solid var(--color-border);
 }
 
 .panel__heading {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-4);
-  margin-bottom: var(--space-4);
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 8px 16px;
 }
 
-.panel__heading p {
-  color: var(--color-muted);
+.narrow-page {
+  max-width: 760px;
 }
 
-.panel__divider {
-  height: 1px;
-  margin-block: var(--space-6);
-  background: var(--color-border);
-}
-
-.eyebrow,
-.page-header__eyebrow {
-  margin-bottom: var(--space-2);
-  color: var(--color-muted);
-  font-size: 0.78rem;
-  font-weight: 700;
-}
-
-.standalone-state {
-  display: grid;
-  min-height: 60vh;
-  place-items: center;
-}
-
-@media (max-width: 640px) {
-  .page-stack {
-    gap: var(--space-6);
-  }
-
-  .panel {
-    padding: var(--space-4);
-  }
-
-  .panel__heading {
-    align-items: flex-start;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    scroll-behavior: auto !important;
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
+@media (max-width: 600px) {
+  body {
+    margin: 16px;
   }
 }
