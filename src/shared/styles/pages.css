@@ -21,6 +21,19 @@
   margin-bottom: 0;
 }
 
+/* 商品一覧は横幅を使って2列に並べ、右側だけが空かないようにします。 */
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px 32px;
+}
+
+@media (max-width: 800px) {
+  .product-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
 .product-detail,
 .order-summary {
   max-width: 760px;
