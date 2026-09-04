@@ -50,6 +50,9 @@ export function CheckoutReviewPage() {
       .then((product) => {
         setProduct(product);
       })
+      .catch(() => {
+        setProduct(null);
+      })
       .finally(() => {
         setIsLoading(false);
       });
@@ -86,19 +89,17 @@ export function CheckoutReviewPage() {
     setError('');
 
     try {
-      const result = await purchaseProductApi(
-        product.id,
-        activeUser.id,
-        requestId,
-      );
+      const result = await purchaseProductApi(product.id, requestId);
       if (result.ok && result.transactionId) {
         navigate(paths.purchaseComplete(result.transactionId));
         return;
       }
 
       setError(result.error ?? '購入処理に失敗しました。');
-    } catch {
-      setError('購入処理に失敗しました。');
+    } catch (error) {
+      setError(
+        error instanceof Error ? error.message : '購入処理に失敗しました。',
+      );
     } finally {
       setIsProcessing(false);
     }

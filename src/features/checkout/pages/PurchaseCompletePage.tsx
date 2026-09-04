@@ -28,7 +28,7 @@ export function PurchaseCompletePage() {
     const loadPurchaseResult = async () => {
       try {
         // ユーザーに関係する取引を取得
-        const transactions = await getTransactions(activeUser.id);
+        const transactions = await getTransactions();
 
         // 今回購入した取引をtransactionIdから特定
         const currentTransaction = transactions.find(
@@ -44,6 +44,9 @@ export function PurchaseCompletePage() {
         const currentProduct = await getProduct(currentTransaction.productId);
 
         setProduct(currentProduct);
+      } catch {
+        setTransaction(null);
+        setProduct(null);
       } finally {
         setIsLoading(false);
       }

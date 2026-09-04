@@ -10,6 +10,7 @@ import { MyPage } from '@/features/account/pages/MyPage';
 import { StoreManagePage } from '@/features/account/pages/StoreManagePage';
 import { StorePage } from '@/features/account/pages/StorePage';
 import { AuthPage } from '@/features/auth/pages/AuthPage';
+import { RequireAuth } from '@/features/auth/components/RequireAuth';
 import { ProductDetailPage } from '@/features/catalog/pages/ProductDetailPage';
 import { ProductListPage } from '@/features/catalog/pages/ProductListPage';
 import { CheckoutPage } from '@/features/checkout/pages/CheckoutPage';
@@ -44,25 +45,30 @@ export const routeObjects: RouteObject[] = [
         children: [
           { path: 'products', element: <ProductListPage /> },
           { path: 'products/:productId', element: <ProductDetailPage /> },
-          { path: 'checkout/:productId', element: <CheckoutPage /> },
-          {
-            path: 'checkout/:productId/review',
-            element: <CheckoutReviewPage />,
-          },
-          {
-            path: 'purchases/:transactionId/complete',
-            element: <PurchaseCompletePage />,
-          },
-          { path: 'mypage', element: <MyPage /> },
-          { path: 'sell', element: <SellPage /> },
-          { path: 'sell/review', element: <SellReviewPage /> },
-          { path: 'sell/sync/:productId', element: <SellSyncPage /> },
-          {
-            path: 'sell/complete/:productId',
-            element: <SellCompletePage />,
-          },
           { path: 'stores/:storeId', element: <StorePage /> },
-          { path: 'store/manage', element: <StoreManagePage /> },
+          {
+            element: <RequireAuth />,
+            children: [
+              { path: 'checkout/:productId', element: <CheckoutPage /> },
+              {
+                path: 'checkout/:productId/review',
+                element: <CheckoutReviewPage />,
+              },
+              {
+                path: 'purchases/:transactionId/complete',
+                element: <PurchaseCompletePage />,
+              },
+              { path: 'mypage', element: <MyPage /> },
+              { path: 'sell', element: <SellPage /> },
+              { path: 'sell/review', element: <SellReviewPage /> },
+              { path: 'sell/sync/:productId', element: <SellSyncPage /> },
+              {
+                path: 'sell/complete/:productId',
+                element: <SellCompletePage />,
+              },
+              { path: 'store/manage', element: <StoreManagePage /> },
+            ],
+          },
           { path: '*', element: <NotFoundPage /> },
         ],
       },

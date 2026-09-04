@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { getProduct, getTransactions } from '@/api/products';
 import { useDemoStore } from '@/app/demo-store-context';
 import { paths } from '@/app/paths';
+import { LogoutButton } from '@/features/auth/components/LogoutButton';
 import type { Product, Transaction } from '@/domain/models';
 import {
   formatDateTime,
@@ -32,7 +33,7 @@ export function MyPage() {
         setIsLoading(true);
 
         // ログインユーザーに関係する取引を取得
-        const transactionData = await getTransactions(activeUser.id);
+        const transactionData = await getTransactions();
 
         // 新しい順に並べる
         const sortedTransactions = [...transactionData].sort((a, b) =>
@@ -92,9 +93,7 @@ export function MyPage() {
             <p>{activeUser.roleLabel}</p>
           </div>
 
-          <ButtonLink to={paths.login} variant="secondary">
-            ユーザーを切り替える
-          </ButtonLink>
+          <LogoutButton />
         </div>
 
         <div className="review-actions">

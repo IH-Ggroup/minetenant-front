@@ -1,6 +1,8 @@
 import { NavLink, Outlet } from 'react-router-dom';
 
 import { paths } from '@/app/paths';
+import { useDemoStore } from '@/app/demo-store-context';
+import { LogoutButton } from '@/features/auth/components/LogoutButton';
 import { classNames } from '@/shared/lib/class-names';
 
 const navItems = [
@@ -10,6 +12,8 @@ const navItems = [
 ];
 
 export function AppLayout() {
+  const { activeUser, authStatus } = useDemoStore();
+
   return (
     <div className="app-shell">
       <a className="skip-link" href="#main-content">
@@ -35,6 +39,14 @@ export function AppLayout() {
               </NavLink>
             ))}
           </nav>
+          {activeUser ? (
+            <div>
+              <span>{activeUser.name}</span>
+              <LogoutButton />
+            </div>
+          ) : authStatus === 'unauthenticated' ? (
+            <NavLink to={paths.login}>ログイン</NavLink>
+          ) : null}
         </div>
       </header>
 

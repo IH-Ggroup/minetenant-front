@@ -17,6 +17,7 @@ export function SellReviewPage() {
 
   const [store, setStore] = useState<Store | null>(null);
   const [error, setError] = useState('');
+  const [isPublishing, setIsPublishing] = useState(false);
 
   const draft = listingDraft;
 
@@ -44,11 +45,20 @@ export function SellReviewPage() {
   }
 
   const handlePublish = async () => {
+    if (isPublishing) return;
+    setIsPublishing(true);
+    setError('');
     try {
       const product = await createProduct(draft);
       navigate(paths.sellSync(product.id));
-    } catch {
-      setError('出品情報を保存できませんでした。');
+    } catch (error) {
+      setError(
+        error instanceof Error
+          ? error.message
+          : '出品情報を保存できませんでした。',
+      );
+    } finally {
+      setIsPublishing(false);
     }
   };
 
@@ -110,7 +120,11 @@ export function SellReviewPage() {
             修正する
           </ButtonLink>
 
-          <Button type="button" onClick={handlePublish}>
+          <Button
+            type="button"
+            isLoading={isPublishing}
+            onClick={handlePublish}
+          >
             出品する
             <ArrowRight size={18} aria-hidden="true" />
           </Button>
