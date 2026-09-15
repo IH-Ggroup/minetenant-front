@@ -27,9 +27,13 @@ describe('npm run setup', () => {
     const example = 'VITE_API_BASE_URL=http://localhost:8787/api/v1\n';
     writeFileSync(join(directory, '.env.example'), example);
 
-    execFileSync(execPath, [script], { cwd: directory });
+    const output = execFileSync(execPath, [script], {
+      cwd: directory,
+      encoding: 'utf8',
+    });
 
     expect(readFileSync(join(directory, '.env.local'), 'utf8')).toBe(example);
+    expect(output).toContain('Hono API の接続先');
   });
 
   it('既存の .env.local を上書きしない', () => {
@@ -38,9 +42,13 @@ describe('npm run setup', () => {
     writeFileSync(join(directory, '.env.example'), 'new value');
     writeFileSync(join(directory, '.env.local'), existing);
 
-    execFileSync(execPath, [script], { cwd: directory });
+    const output = execFileSync(execPath, [script], {
+      cwd: directory,
+      encoding: 'utf8',
+    });
 
     expect(readFileSync(join(directory, '.env.local'), 'utf8')).toBe(existing);
+    expect(output).toContain('現在の設定をそのまま使用します');
   });
 
   it('作成できない場合は失敗を通知する', () => {

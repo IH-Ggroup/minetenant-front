@@ -5,7 +5,7 @@ import { constants, copyFileSync } from 'node:fs';
 try {
   copyFileSync('.env.example', '.env.local', constants.COPYFILE_EXCL);
   console.log(
-    '.env.local を作成しました。Laravel API の接続先を確認してください。',
+    '.env.local を作成しました。Hono API の接続先を確認してください。',
   );
 } catch (error) {
   if (error.code === 'EEXIST') {
