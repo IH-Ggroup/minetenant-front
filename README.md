@@ -9,7 +9,7 @@ Vite + React + TypeScript 製の土台です。
 
 - 主要画面へ移動できる React Router の設定
 - 商品一覧、購入、出品、マイページ、店舗、取引の基本画面
-- 共通の `src/api/client.ts` を通じた Laravel API への接続
+- 共通の `src/api/client.ts` を通じた Hono API への接続
 - Cookie を使うログイン・新規登録・ログアウト・ログイン状態の復元
 - ログインユーザーと出品下書きを持つ小さな Context
 - 入力フォームの最低限のバリデーション
@@ -22,7 +22,7 @@ Vite + React + TypeScript 製の土台です。
 ## この土台に含まないもの
 
 - メール認証・パスワード再設定
-- バックエンド本体（別途 Laravel API の起動が必要）
+- バックエンド本体（別途 Hono API の起動が必要）
 - 決済、配送、画像アップロード
 - 出品下書きの永続化（リロード・ログアウトすると失われます）
 - Minecraft サーバーとの通信
@@ -34,24 +34,31 @@ API に保存した商品・取引データはバックエンド側に残りま�
 
 ## Docker を使わずに動かす
 
-フロントは Node.js、バックエンドは PHP + MySQL を PC に入れて動かします。
-Docker Desktop や旧 PoC のプロジェクトは不要です。
+フロントとHonoバックエンドはNode.js、データベースはMySQLをPCに入れて動かします。
+Docker Desktopや旧PoCのプロジェクトは不要です。
 
 ### 初回だけ行うこと
 
-1. Node.js 22 系の 22.22.2 以降（推奨）と npm 10 以上をインストールします。
-   `node -v` と `npm -v` で確認できます。テスト用ライブラリも使うため、古い Node.js 22 では動きません。
-2. [バックエンドの README](https://github.com/IH-Ggroup/minetenant-backend#readme) に沿って、
-   PHP・Composer・MySQL と開発用 DB の初期設定を行います。
-3. このリポジトリのフォルダで、次のコマンドを実行します。
+1. Node.js 22.22.2（推奨）とnpm 10以上、MySQL 8.4をインストールします。
+   `node -v`、`npm -v`、`mysql --version`で確認できます。利用できるNode.jsの正確な範囲は
+   [`package.json`](package.json) の `engines` を確認してください。
+2. [バックエンドのREADME](https://github.com/IH-Ggroup/minetenant-backend/blob/develop/README.md)に沿って、
+   MySQLの開発用DBを準備します。続けて、バックエンドのフォルダで初回セットアップを行います。
+
+   ```bash
+   npm ci
+   npm run setup
+   ```
+
+3. このフロントのフォルダで初回セットアップを行います。
 
 ```bash
 npm ci
 npm run setup
 ```
 
-`npm run setup` は `.env.example` をコピーして `.env.local` を作成します。
-Windows / macOS / Linux 共通のコマンドです。既存の `.env.local` は上書きしません。
+フロントの`npm run setup`は`.env.example`をコピーして`.env.local`を作成します。
+Windows / macOS / Linux共通のコマンドです。既存の`.env.local`は上書きしません。
 
 接続先の初期値は次のとおりです。接続先を変えた場合は Vite を再起動してください。
 
@@ -61,33 +68,45 @@ VITE_API_BASE_URL=http://localhost:8787/api/v1
 
 ### 開発するたびに行うこと
 
-起動する順番は **MySQL → Laravel → フロント** です。
+起動する順番は **MySQL → Hono → Vite** です。
 
-1. PC にインストールした MySQL を起動します（方法はバックエンドの README を参照）。
-2. ターミナルを開き、**バックエンドのフォルダ**で起動します。
-
-   ```bash
-   composer run dev
-   ```
-
-3. 別のターミナルを開き、**このフロントのフォルダ**で起動します。
+1. PCにインストールしたMySQLを起動します（方法は
+   [バックエンドのREADME](https://github.com/IH-Ggroup/minetenant-backend/blob/develop/README.md)を参照）。
+2. ターミナルを開き、**バックエンドのフォルダ**でHono APIを起動します。
 
    ```bash
    npm run dev
    ```
 
-4. [http://localhost:5173](http://localhost:5173) をブラウザで開きます。
+3. ブラウザで[http://localhost:8787/api/hello](http://localhost:8787/api/hello)を開き、
+   `MineTenant API is running.`と表示されることを確認します。
+4. 別のターミナルを開き、**このフロントのフォルダ**でViteを起動します。
 
-Laravel と Vite のターミナルは開いたままにします。終了するときは、それぞれ `Ctrl + C` を押してください。
-フロントの設定に MySQL のパスワードは書きません。DB への接続は Laravel が担当します。
+   ```bash
+   npm run dev
+   ```
+
+5. [http://localhost:5173](http://localhost:5173)をブラウザで開きます。
+
+HonoとViteのターミナルは開いたままにします。終了するときは、それぞれのターミナルで
+`Ctrl + C`を押してください。その後、普段使っている方法でMySQLを停止します。
+
+フロントの`.env.local`に必要なのは`VITE_API_BASE_URL`だけです。MySQLのユーザー名・パスワードや
+Minecraft用トークンは書かず、Gitにも追加しません。DBへの接続はHonoが担当します。
 
 ### 起動に困ったとき
 
+- 画面に「APIの接続先が未設定です」と表示される：`.env.local`がない場合は、フロントのフォルダで
+  `npm run setup`を実行します。ある場合は`VITE_API_BASE_URL`の名前と値を確認します。変更後はViteを
+  `Ctrl + C`で止め、`npm run dev`で再起動してください。
+- 画面に「APIに接続できません」と表示される：
+  [http://localhost:8787/api/hello](http://localhost:8787/api/hello)を直接開きます。表示できない場合は、
+  MySQL、Honoの順に起動し、Hono側のターミナルに出たエラーを確認してください。
 - `Port 5173 is already in use`：既に起動しているフロントを終了してから再実行します。
-  API の接続設定とずれないよう、ポート番号は自動変更しません。
-- 商品取得に失敗する：MySQL と Laravel が起動しているか、`.env.local` の URL が正しいかを確認します。
-- `localhost` と `127.0.0.1` を混在させないでください。この手順では `localhost` に統一します。
-- 別の PC で使う場合も、その PC 上に上記の環境を用意します。この設定はインターネット公開用ではありません。
+- `Port 8787 is already in use`：以前起動したAPIを終了します。別のAPIを8787番で同時に起動できません。
+- CookieやCORSのエラーになる：`localhost`と`127.0.0.1`を混在させていないか確認します。
+  この手順では`localhost`に統一します。Honoへ切り替えた直後は一度ログインし直してください。
+- 別のPCで使う場合も、そのPC上に上記の環境を用意します。この設定はインターネット公開用ではありません。
 
 ### ログインして動かす
 
@@ -103,7 +122,7 @@ Laravel と Vite のターミナルは開いたままにします。終了する
 - 401 ではログイン状態を解除し、ログイン必須の画面ならログイン画面へ戻ります。419 では再操作・再ログインを案内し、購入や出品を自動再送しません。
 - ログアウトはヘッダーまたはマイページのボタンから行います。通信に失敗した場合は成功扱いにしません。
 
-`DemoStoreProvider` は既存ページとの互換性のため名前を残していますが、ユーザーの認証はLaravelが担当します。
+`DemoStoreProvider`は既存ページとの互換性のため名前を残していますが、ユーザーの認証はHonoが担当します。
 この変更は決済・配送・Minecraft側の認証を実装するものではなく、インターネット公開用の設定でもありません。
 
 ## 品質確認
@@ -115,7 +134,7 @@ npm run test
 npm run build
 ```
 
-`npm run test` はテスト用の API データを使うため、Laravel・MySQL を起動せず実行できます。
+`npm run test`はテスト用のAPIデータを使うため、Hono・MySQLを起動せず実行できます。
 これは画面遷移・認証状態・APIクライアント・セットアップ処理の確認です。
 実際の API との接続確認は、両方を起動して別途行います。
 
@@ -142,7 +161,7 @@ npm run build
 
 ```text
 src/
-├── api/          # Laravel API との通信
+├── api/          # Hono API との通信
 ├── app/          # Router と簡易 Context
 ├── domain/       # 画面で使う型
 ├── features/     # 機能ごとのページ
