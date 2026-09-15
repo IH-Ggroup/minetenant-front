@@ -6,7 +6,7 @@ import tseslint from 'typescript-eslint';
 import { defineConfig, globalIgnores } from 'eslint/config';
 
 export default defineConfig([
-  globalIgnores(['dist', 'coverage']),
+  globalIgnores(['dist', 'coverage', '.wrangler']),
   {
     files: ['**/*.{ts,tsx}'],
     extends: [
@@ -16,6 +16,7 @@ export default defineConfig([
       reactRefresh.configs.vite,
     ],
     languageOptions: {
+      parserOptions: { tsconfigRootDir: import.meta.dirname },
       ecmaVersion: 2022,
       globals: globals.browser,
     },

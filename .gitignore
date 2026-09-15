@@ -8,6 +8,10 @@ coverage/
 # Local environment
 .env
 .env.local
+.env.*.local
+.dev.vars
+.dev.vars.*
+.wrangler/
 
 # Editors and operating systems
 .DS_Store

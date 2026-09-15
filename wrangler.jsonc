@@ -1,0 +1,19 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "minetenant-front",
+  "account_id": "060157799570391e133d37b29412eca0",
+  "main": "worker/index.js",
+  "compatibility_date": "2026-09-04",
+  "workers_dev": true,
+  "preview_urls": false,
+  // Preserve runtime values configured in Cloudflare when deploying from Git.
+  // API_ORIGIN and API_ORIGIN_TOKEN must never be embedded in the browser build.
+  "keep_vars": true,
+  "build": { "command": "npm run build:cloudflare" },
+  "assets": {
+    "directory": "./dist",
+    "binding": "ASSETS",
+    "not_found_handling": "single-page-application",
+    "run_worker_first": ["/api", "/api/*"],
+  },
+}

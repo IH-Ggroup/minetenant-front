@@ -9,18 +9,18 @@ import type {
 export const DEMO_USERS: SessionUser[] = [
   {
     id: 'user-buyer',
-    name: '山田 みどり',
+    name: 'デモ 太郎',
     role: 'buyer',
     roleLabel: '購入者デモ',
-    avatarInitial: '山',
+    avatarInitial: 'D',
     storeId: 'store-yamada',
   },
   {
     id: 'user-seller',
-    name: '青鉱舎 店長',
+    name: 'デモ 花子',
     role: 'seller',
     roleLabel: '出品者デモ',
-    avatarInitial: 'M',
+    avatarInitial: 'D',
     storeId: 'store-mine',
   },
 ];
