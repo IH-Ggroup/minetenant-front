@@ -8,7 +8,8 @@ export type ProductTheme =
 
 export interface SessionUser {
   id: string;
-  name: string;
+  username: string;
+  displayName: string;
   role: UserRole;
   roleLabel: string;
   avatarInitial: string;

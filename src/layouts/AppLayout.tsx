@@ -41,7 +41,7 @@ export function AppLayout() {
           </nav>
           {activeUser ? (
             <div>
-              <span>{activeUser.name}</span>
+              <span>{activeUser.displayName}</span>
               <LogoutButton />
             </div>
           ) : authStatus === 'unauthenticated' ? (

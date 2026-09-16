@@ -45,7 +45,7 @@ export function MyPage() {
         // 取引に紐づく商品情報を取得
         const productEntries = await Promise.all(
           sortedTransactions.map(async (transaction) => {
-            const product = await getProduct(transaction.productId); //メモ
+            const product = await getProduct(transaction.productId);
 
             return [transaction.productId, product] as const;
           }),
@@ -89,7 +89,10 @@ export function MyPage() {
       <section className="panel">
         <div className="panel__heading">
           <div>
-            <h2>{activeUser.name}</h2>
+            <h2>{activeUser.displayName}</h2>
+            {activeUser.displayName !== activeUser.username && (
+              <p>@{activeUser.username}</p>
+            )}
             <p>{activeUser.roleLabel}</p>
           </div>
 

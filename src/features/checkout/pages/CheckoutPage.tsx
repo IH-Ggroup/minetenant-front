@@ -25,8 +25,8 @@ export function CheckoutPage() {
 
   const [isLoading, setIsLoading] = useState(true);
   const [draft, setDraft] = useState<CheckoutDraft>({
-    ...DEFAULT_CHECKOUT_DRAFT, //住所
-    name: activeUser?.name ?? '',
+    ...DEFAULT_CHECKOUT_DRAFT,
+    name: activeUser?.displayName ?? '',
   });
 
   useEffect(() => {

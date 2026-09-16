@@ -6,13 +6,18 @@ let auth: typeof import('./auth');
 let client: typeof import('./client');
 const user = {
   id: 'user-1',
-  name: '山田',
+  username: 'yamada',
+  displayName: '山田',
   role: 'buyer',
   roleLabel: '購入者',
   avatarInitial: '山',
   storeId: 'store-1',
 };
-const loginInput = { email: 'demo@minetenant.jp', password: 'password' };
+
+const loginInput = {
+  username: 'yamada',
+  password: 'password',
+};
 
 function jsonResponse(payload: unknown, status = 200): Response {
   return new Response(JSON.stringify(payload), {
@@ -52,15 +57,19 @@ describe('Cookie-session authentication API', () => {
         );
       const input =
         action === 'register'
-          ? { ...loginInput, name: '山田', password_confirmation: 'password' }
+          ? {
+              ...loginInput,
+              displayName: '山田',
+              password_confirmation: 'password',
+            }
           : loginInput;
 
       const result =
         action === 'register'
           ? await auth.register({
               ...loginInput,
-              name: '山田',
-              password_confirmation: 'password',
+              displayName: '山田',
+              passwordConfirmation: 'password',
             })
           : await auth.login(loginInput);
 
@@ -187,8 +196,8 @@ describe('Cookie-session authentication API', () => {
             ? auth.login(loginInput)
             : auth.register({
                 ...loginInput,
-                name: '山田',
-                password_confirmation: 'password',
+                displayName: '山田',
+                passwordConfirmation: 'password',
               });
       await vi.waitFor(() => {
         expect(
