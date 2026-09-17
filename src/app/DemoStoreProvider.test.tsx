@@ -68,7 +68,7 @@ describe('Laravelセッションの状態管理', () => {
     const { result } = renderHook(useDemoStore, { wrapper: DemoStoreProvider });
     await act(() =>
       result.current.login({
-        email: 'seller@minetenant.jp',
+        username: 'seller',
         password: 'password',
       }),
     );
@@ -87,10 +87,10 @@ describe('Laravelセッションの状態管理', () => {
     );
     await act(() =>
       result.current.register({
-        name: '出品者',
-        email: 'new@example.com',
+        username: 'newuser',
+        displayName: '出品者',
         password: 'password',
-        password_confirmation: 'password',
+        passwordConfirmation: 'password',
       }),
     );
     expect(result.current.authStatus).toBe('authenticated');
@@ -111,17 +111,17 @@ describe('Laravelセッションの状態管理', () => {
     let pending!: Promise<void>;
     act(() => {
       pending = result.current.login({
-        email: 'seller@example.test',
+        username: 'seller',
         password: 'password',
       });
     });
     await expect(result.current.logout()).rejects.toThrow('認証処理中');
     await expect(
       result.current.register({
-        name: '別の利用者',
-        email: 'other@example.test',
+        username: 'otheruser',
+        displayName: '別の利用者',
         password: 'password',
-        password_confirmation: 'password',
+        passwordConfirmation: 'password',
       }),
     ).rejects.toThrow('認証処理中');
     expect(logout).not.toHaveBeenCalled();
@@ -144,7 +144,7 @@ describe('Laravelセッションの状態管理', () => {
     await waitFor(() =>
       expect(result.current.authStatus).toBe('authenticated'),
     );
-    const input = { email: 'seller@example.test', password: 'password' };
+    const input = { username: 'seller', password: 'password' };
     await expect(result.current.login(input)).rejects.toThrow('通信失敗');
     await act(() => result.current.login(input));
     expect(result.current.activeUser?.id).toBe(DEMO_USERS[1].id);
