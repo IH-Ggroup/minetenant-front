@@ -23,7 +23,7 @@ beforeEach(() => {
   vi.mocked(logout).mockResolvedValue(undefined);
 });
 
-describe('Laravelセッションの状態管理', () => {
+describe('Honoセッションの状態管理', () => {
   it('初回は読み込み中にして、APIのユーザーを復元する', async () => {
     const { result } = renderHook(useDemoStore, { wrapper: DemoStoreProvider });
     expect(result.current.authStatus).toBe('loading');

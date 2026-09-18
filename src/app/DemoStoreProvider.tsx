@@ -18,7 +18,7 @@ import { onUnauthorized } from '@/api/client';
 import { DemoStoreContext } from '@/app/demo-store-context';
 import type { SessionUser, CreateProductInput } from '@/domain/models';
 
-// 既存ページへの影響を抑えるため名前を維持しています。認証情報はLaravelが管理します。
+// 各画面で共有している名前は維持し、認証情報はHono APIで管理します。
 export function DemoStoreProvider({ children }: PropsWithChildren) {
   const [activeUser, setActiveUser] = useState<SessionUser | null>(null);
   const [authStatus, setAuthStatus] = useState<

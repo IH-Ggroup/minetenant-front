@@ -1,6 +1,6 @@
 /**
- * Same-origin bridge for the public demo. The Laravel server is reachable only
- * through a token-protected local gateway, never by exposing `artisan serve`.
+ * Same-origin bridge for the public demo. The Hono API is reachable only
+ * through a token-protected local gateway, never by exposing the local server.
  * API_ORIGIN and API_ORIGIN_TOKEN are Worker runtime secrets, not VITE_ values.
  */
 const MAX_REQUEST_BYTES = 64 * 1024;
@@ -243,8 +243,8 @@ export async function handleRequest(
         'APIに接続できません。公開設定を確認してください。',
       );
     }
-    // Do not expose a Tunnel error page, Laravel debug HTML, or an upstream
-    // stack trace. Laravel's expected validation/authentication JSON is retained.
+    // Do not expose a Tunnel error page, API debug HTML, or an upstream stack
+    // trace. Hono's expected validation/authentication JSON is retained.
     if (response.status >= 500) {
       await response.body?.cancel();
       return problem(
