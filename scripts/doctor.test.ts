@@ -150,6 +150,46 @@ describe('npm run doctor', () => {
     expect(reporter.messages.join('\n')).toContain('5ms以内');
   });
 
+  it('タイムアウトによるabort後のrejectを未処理にしない', async () => {
+    const directory = createDirectory();
+    writeFileSync(
+      join(directory, '.env.local'),
+      'VITE_API_BASE_URL=http://localhost:8787/api/v1\n',
+    );
+    const reporter = createReporter();
+    let aborted = false;
+
+    const result = await runDoctor({
+      cwd: directory,
+      fetchImpl: (_url: string, init?: RequestInit) =>
+        new Promise<Response>((_resolve, reject) => {
+          const signal = init?.signal;
+          if (!signal) {
+            reject(new Error('AbortSignalが指定されていません。'));
+            return;
+          }
+
+          signal.addEventListener(
+            'abort',
+            () => {
+              aborted = true;
+              reject(
+                new DOMException('The operation was aborted.', 'AbortError'),
+              );
+            },
+            { once: true },
+          );
+        }),
+      timeoutMs: 5,
+      log: reporter.log,
+      error: reporter.error,
+    });
+
+    expect(result).toBe(1);
+    expect(aborted).toBe(true);
+    expect(reporter.messages.join('\n')).toContain('5ms以内');
+  });
+
   it('本文の受信が止まった場合もタイムアウトする', async () => {
     const directory = createDirectory();
     writeFileSync(

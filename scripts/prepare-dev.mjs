@@ -27,17 +27,16 @@ function hasDependencyFiles(cwd, exists) {
 
 export function hasDevelopmentDependencies(
   cwd = process.cwd(),
-  {
-    exists = existsSync,
-    readFile = readFileSync,
-    fingerprint = packageLockFingerprint(cwd, readFile),
-  } = {},
+  { exists = existsSync, readFile = readFileSync, fingerprint } = {},
 ) {
   if (!hasDependencyFiles(cwd, exists)) return false;
 
   try {
+    const expectedFingerprint =
+      fingerprint ?? packageLockFingerprint(cwd, readFile);
     return (
-      readFile(resolve(cwd, DEPENDENCY_SENTINEL), 'utf8').trim() === fingerprint
+      readFile(resolve(cwd, DEPENDENCY_SENTINEL), 'utf8').trim() ===
+      expectedFingerprint
     );
   } catch {
     return false;

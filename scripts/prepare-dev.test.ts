@@ -95,6 +95,16 @@ describe('npm run devの初回準備', () => {
     expect(spawn).not.toHaveBeenCalled();
   });
 
+  it('package-lock.jsonがなくても依存関係の有無を例外なく判定する', () => {
+    const directory = createDirectory();
+    rmSync(join(directory, 'package-lock.json'));
+
+    expect(hasDevelopmentDependencies(directory)).toBe(false);
+
+    addDependencyFiles(directory);
+    expect(hasDevelopmentDependencies(directory)).toBe(false);
+  });
+
   it('package-lock.jsonが変わった場合はnpm ciを再実行する', () => {
     const directory = createDirectory();
     addDependencyMarkers(directory);
