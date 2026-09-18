@@ -55,7 +55,7 @@ describe('Products API with authenticated ownership', () => {
     }
   });
 
-  it('sends only listing fields, stripping even legacy owner IDs from an input object', async () => {
+  it('sends only listing fields, stripping client-provided owner IDs from an input object', async () => {
     const product = INITIAL_PRODUCTS[0];
     const input = {
       ...product,
