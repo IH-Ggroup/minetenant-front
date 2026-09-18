@@ -27,8 +27,8 @@ describe('MineTenant routes', () => {
     const loginButton = await screen.findByRole('button', {
       name: 'ログインして商品を見る',
     });
-    fireEvent.change(screen.getByLabelText('メールアドレス'), {
-      target: { value: 'demo@minetenant.jp' },
+    fireEvent.change(screen.getByLabelText('ユーザー名'), {
+      target: { value: 'demo_user' },
     });
     fireEvent.change(screen.getByLabelText('パスワード'), {
       target: { value: 'password' },
@@ -42,7 +42,7 @@ describe('MineTenant routes', () => {
       await screen.findByRole('heading', { name: INITIAL_PRODUCTS[0].name }),
     ).toBeInTheDocument();
     expect(login).toHaveBeenCalledWith({
-      email: 'demo@minetenant.jp',
+      username: 'demo_user',
       password: 'password',
     });
     expect(getProducts).toHaveBeenCalledOnce();
@@ -71,10 +71,10 @@ describe('MineTenant routes', () => {
 
   it('未ログインで保護画面を開くとログイン後に元の画面へ戻る', async () => {
     const { router } = renderApp('/sell');
-    await screen.findByLabelText('メールアドレス');
+    await screen.findByLabelText('ユーザー名');
     expect(router.state.location.pathname).toBe('/login');
-    fireEvent.change(screen.getByLabelText('メールアドレス'), {
-      target: { value: 'demo@minetenant.jp' },
+    fireEvent.change(screen.getByLabelText('ユーザー名'), {
+      target: { value: 'demo_user' },
     });
     fireEvent.change(screen.getByLabelText('パスワード'), {
       target: { value: 'password' },
@@ -89,13 +89,13 @@ describe('MineTenant routes', () => {
   it('認証情報が間違っている場合は画面遷移しない', async () => {
     vi.mocked(login).mockRejectedValueOnce(
       new ApiError(422, '入力内容を確認してください。', undefined, {
-        email: ['メールアドレスまたはパスワードが正しくありません。'],
+        username: ['ユーザー名またはパスワードが正しくありません。'],
       }),
     );
     const { router } = renderApp('/login');
-    await screen.findByLabelText('メールアドレス');
-    fireEvent.change(screen.getByLabelText('メールアドレス'), {
-      target: { value: 'demo@minetenant.jp' },
+    await screen.findByLabelText('ユーザー名');
+    fireEvent.change(screen.getByLabelText('ユーザー名'), {
+      target: { value: 'demo_user' },
     });
     fireEvent.change(screen.getByLabelText('パスワード'), {
       target: { value: 'wrong-password' },
@@ -104,9 +104,7 @@ describe('MineTenant routes', () => {
       screen.getByRole('button', { name: 'ログインして商品を見る' }),
     );
     expect(
-      await screen.findByText(
-        'メールアドレスまたはパスワードが正しくありません。',
-      ),
+      await screen.findByText('ユーザー名またはパスワードが正しくありません。'),
     ).toBeInTheDocument();
     expect(router.state.location.pathname).toBe('/login');
   });
@@ -128,7 +126,7 @@ describe('MineTenant routes', () => {
     vi.mocked(getCurrentUser).mockResolvedValue({ ...DEMO_USERS[0] });
     const { router } = renderApp('/sell');
     fireEvent.click(await screen.findByRole('button', { name: 'ログアウト' }));
-    await screen.findByLabelText('メールアドレス');
+    await screen.findByLabelText('ユーザー名');
     expect(logout).toHaveBeenCalledOnce();
     expect(router.state.location.pathname).toBe('/login');
     expect(screen.queryByLabelText('商品名')).not.toBeInTheDocument();

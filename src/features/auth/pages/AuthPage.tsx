@@ -21,11 +21,17 @@ type FieldErrors = Partial<Record<FieldName, string[]>>;
 interface AuthFieldProps extends InputHTMLAttributes<HTMLInputElement> {
   name: FieldName;
   label: string;
-  errors?: string[];
   required?: boolean;
+  errors?: string[];
 }
 
-function AuthField({ name, label, errors, ...props }: AuthFieldProps) {
+function AuthField({
+  name,
+  label,
+  errors,
+  required = true,
+  ...props
+}: AuthFieldProps) {
   const id = `auth-${name}`;
   const hasErrors = Boolean(errors?.length);
 
@@ -39,7 +45,7 @@ function AuthField({ name, label, errors, ...props }: AuthFieldProps) {
         id={id}
         className="input"
         name={name}
-        required
+        required={required}
         aria-invalid={hasErrors || undefined}
         aria-describedby={hasErrors ? `${id}-error` : undefined}
       />
@@ -116,10 +122,10 @@ function AuthForm({ isSignup }: { isSignup: boolean }) {
     try {
       if (isSignup) {
         await register({
-          username: String(data.get('name') ?? ''),
+          username: String(data.get('username') ?? ''),
           displayName: String(data.get('displayName') ?? '') || null,
           password,
-          passwordConfirmation: String(data.get('password_confirmation') ?? ''),
+          passwordConfirmation: String(data.get('passwordConfirmation') ?? ''),
         });
       } else {
         await login({ username, password });
@@ -258,6 +264,7 @@ function AuthForm({ isSignup }: { isSignup: boolean }) {
           <AuthField
             name="displayName"
             label="表示名"
+            required={false}
             type="text"
             autoComplete="name"
             maxLength={120}

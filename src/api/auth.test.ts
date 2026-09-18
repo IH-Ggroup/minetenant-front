@@ -60,7 +60,7 @@ describe('Cookie-session authentication API', () => {
           ? {
               ...loginInput,
               displayName: '山田',
-              password_confirmation: 'password',
+              passwordConfirmation: 'password',
             }
           : loginInput;
 

@@ -9,8 +9,8 @@ import type {
 export const DEMO_USERS: SessionUser[] = [
   {
     id: 'user-buyer',
-    username: 'デモ 太郎',
-    displayName: '違う名前',
+    username: 'tarou',
+    displayName: 'デモ太郎',
     role: 'buyer',
     roleLabel: '購入者デモ',
     avatarInitial: 'D',
@@ -18,8 +18,8 @@ export const DEMO_USERS: SessionUser[] = [
   },
   {
     id: 'user-seller',
-    username: 'デモ 花子',
-    displayName: '違う名前',
+    username: 'hanako',
+    displayName: 'デモ花子',
     role: 'seller',
     roleLabel: '出品者デモ',
     avatarInitial: 'D',
