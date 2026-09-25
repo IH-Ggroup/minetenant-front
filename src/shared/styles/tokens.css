@@ -1,9 +1,25 @@
 /* デザイン担当が色・書体を決めるための最小限の初期値です。 */
 :root {
   font-family: sans-serif;
-  --color-text: #222;
-  --color-muted: #555;
-  --color-background: #fff;
-  --color-border: #aaa;
-  --color-link: #0000ee;
+  /*color*/
+  --color-text: #745537;
+  --color-nav: #C7B99C;
+  --color-background: #EBE3D3;
+  --color-border: #000;
+  --color-link: #fff;
+  --color-buttun-main: #65863E;
+  --color-buttun-back: #815D3B;
+  --color-mypage-menu: #815D3B;
+  --color-mypage-buttun: #A17953;
+  /*text size*/
+  --size-title: 24px;
+  --size-subtitle: 16px;
+  --size-body: 14px;
+  --size-detail: 12px;
+  /*space*/
+  --space-product-card: 8px;
+  --space-form: 16px;
+  /*radius*/
+  --card-corner: 8px;
+
 }
