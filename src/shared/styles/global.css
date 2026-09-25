@@ -28,7 +28,7 @@ button {
 
 a {
   color: var(--color-link);
-  text-decoration: underline;
+  text-decoration: none;
 }
 
 h1 {
@@ -47,7 +47,7 @@ h1,
 h2,
 h3,
 p {
-  margin: 12px 0;
+  margin: 15px 0;
 }
 
 img {
