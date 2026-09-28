@@ -6,7 +6,7 @@ export type ProductCategory =
 export type ProductTheme =
   'ocean' | 'forest' | 'amethyst' | 'sunset' | 'sand' | 'moss';
 
-export type ProductStatus = 'available' | 'sold'; //
+export type ProductStatus = 'available' | 'sold';
 
 export interface SessionUser {
   id: string;
@@ -28,7 +28,7 @@ export interface Product {
   category: ProductCategory;
   theme: ProductTheme;
   emoji: string;
-  createdAt: string;
+  createdAt: string | null;
 }
 
 export interface Store {

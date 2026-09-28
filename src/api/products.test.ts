@@ -30,8 +30,18 @@ afterEach(() => {
 
 describe('Products API with authenticated ownership', () => {
   it('uses the public and protected GET URLs with encoded IDs and credentials', async () => {
-    fetchMock.mockImplementation(async () => jsonResponse({ data: [] }));
+    const product = INITIAL_PRODUCTS[0];
 
+    fetchMock.mockImplementation(async (url) => {
+      const urlString = String(url);
+      if (urlString.includes('/products/product%20')) {
+        return jsonResponse({ data: product });
+      }
+      if (urlString.includes('/products')) {
+        return jsonResponse({ data: [product] });
+      }
+      return jsonResponse({ data: [] });
+    });
     await products.getProducts();
     await products.getProducts('store /?');
     await products.getProduct('product /?');
@@ -53,6 +63,60 @@ describe('Products API with authenticated ownership', () => {
         'application/json',
       );
     }
+  });
+  it('returns products from the API data payload', async () => {
+    const product = INITIAL_PRODUCTS[0];
+
+    fetchMock.mockResolvedValue(
+      jsonResponse({
+        data: [product],
+      }),
+    );
+
+    await expect(products.getProducts()).resolves.toEqual([product]);
+  });
+  it('returns a product from the API data payload', async () => {
+    const product = INITIAL_PRODUCTS[0];
+
+    fetchMock.mockResolvedValue(
+      jsonResponse({
+        data: product,
+      }),
+    );
+
+    await expect(products.getProduct(product.id)).resolves.toEqual(product);
+  });
+  //
+  it('does not accept an unknown product status', async () => {
+    const product = {
+      ...INITIAL_PRODUCTS[0],
+      status: 'unknown',
+    };
+
+    fetchMock.mockResolvedValue(
+      jsonResponse({
+        data: product,
+      }),
+    );
+
+    await expect(products.getProduct(product.id)).rejects.toThrow();
+  }); //
+  it('does not accept an unknown product status in the product list', async () => {
+    const productList = [
+      INITIAL_PRODUCTS[0],
+      {
+        ...INITIAL_PRODUCTS[1],
+        status: 'unknown',
+      },
+    ];
+
+    fetchMock.mockResolvedValue(
+      jsonResponse({
+        data: productList,
+      }),
+    );
+
+    await expect(products.getProducts()).rejects.toThrow();
   });
 
   it('sends only listing fields, stripping even legacy owner IDs from an input object', async () => {
