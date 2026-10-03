@@ -125,6 +125,7 @@ describe('Products API with authenticated ownership', () => {
       ...product,
       sellerId: 'spoofed-seller',
       storeId: 'spoofed-store',
+      stock: 1,
     };
     fetchMock.mockResolvedValue(jsonResponse({ data: product }, 201));
 
@@ -136,7 +137,7 @@ describe('Products API with authenticated ownership', () => {
       name: product.name,
       description: product.description,
       price: product.price,
-      stock: product.stock,
+      stock: 1,
       category: product.category,
       theme: product.theme,
       emoji: product.emoji,
