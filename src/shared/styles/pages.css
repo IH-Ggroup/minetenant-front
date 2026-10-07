@@ -118,16 +118,6 @@
   overflow-x: auto;
 }
 
-/* .inventory-table__head,
-.inventory-table__row {
-  display: grid;
-  grid-template-columns: minmax(160px, 1fr) 64px 80px 80px;
-  gap: 12px;
-  min-width: 440px;
-  padding: 8px 0;
-  border-bottom: 1px solid var(--color-border);
-} */
-
 .inventory-table__head,
 .inventory-table__row {
   display: grid;
