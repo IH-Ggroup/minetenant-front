@@ -116,8 +116,6 @@ export function PurchaseCompletePage() {
             <h2>{product.name}</h2>
             <p>{formatPrice(transaction.amount)}</p>
           </div>
-
-          <span>在庫 {product.stock}点</span>
         </div>
       </section>
 

@@ -90,7 +90,6 @@ export function StoreManagePage() {
             <div className="inventory-table__head" role="row">
               <span role="columnheader">商品</span>
               <span role="columnheader">在庫</span>
-              <span role="columnheader">状態</span>
               <span role="columnheader">確認</span>
             </div>
 
@@ -103,11 +102,13 @@ export function StoreManagePage() {
                   </span>
                 </span>
 
-                <strong role="cell">{product.stock}点</strong>
-
                 <span role="cell">
-                  <Badge tone={product.stock > 0 ? 'success' : 'warning'}>
-                    {product.stock > 0 ? '販売中' : '売り切れ'}
+                  <Badge
+                    tone={
+                      product.status === 'available' ? 'success' : 'warning'
+                    }
+                  >
+                    {product.status === 'available' ? '販売中' : '売り切れ'}
                   </Badge>
                 </span>
 
