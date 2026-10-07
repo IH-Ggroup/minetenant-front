@@ -90,7 +90,6 @@ export function StoreManagePage() {
             <div className="inventory-table__head" role="row">
               <span role="columnheader">商品</span>
               <span role="columnheader">在庫</span>
-              <span role="columnheader">状態</span>
               <span role="columnheader">確認</span>
             </div>
 
