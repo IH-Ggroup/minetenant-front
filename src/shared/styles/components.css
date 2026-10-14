@@ -23,28 +23,31 @@ button:disabled,
   text-decoration: none;
 }
 
-.button--primary{
+.button--primary {
   background-color: var(--color-button-main);
   color: #ffff;
   box-shadow: 0 5px 0 var(--color-button-back);
 }
 
-.button--secondary{
+.button--secondary {
   background-color: var(--color-mypage-button);
   color: #ffff;
   border: 1px solid var(--color-border);
 }
 
-.is-current{
+.is-current {
 }
-.is-complete{
+.is-complete {
 }
 
-.empty-state__icon{}
-.empty-state__title{}
-.empty-state__des{}
-.empty-state__action{}
-
+.empty-state__icon {
+}
+.empty-state__title {
+}
+.empty-state__des {
+}
+.empty-state__action {
+}
 
 /* 装飾用アイコンを外しても、操作名・処理中の文言は残ります。 */
 .button svg,
@@ -173,9 +176,8 @@ button:disabled,
   font-size: 0.875rem;
 }
 
-.badge--neutral{
+.badge--neutral {
 }
-
 
 .breadcrumbs {
   display: flex;
