@@ -7,7 +7,7 @@ import { getProducts } from '@/api/products';
 import { DEMO_USERS, INITIAL_PRODUCTS } from '@/mocks/fixtures';
 import { renderApp } from '@/test/render-app';
 
-// 画面遷移のテストなので API 境界を置き換えます。Laravel / MySQL は不要です。
+// 画面遷移のテストなので API 境界を置き換えます。Hono / MySQL は不要です。
 vi.mock('@/api/products');
 vi.mock('@/api/auth');
 

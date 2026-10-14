@@ -51,8 +51,8 @@ export function SellCompletePage() {
         </span>
         <h1>出品が完了しました</h1>
         <p>
-          {product.name}（{formatPrice(product.price)}・在庫{product.stock}
-          点）を商品一覧へ追加しました。
+          {product.name}（{formatPrice(product.price)}
+          ）を商品一覧へ追加しました。
         </p>
       </section>
 

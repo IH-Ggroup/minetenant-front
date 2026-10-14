@@ -9,6 +9,8 @@
   },
   "scripts": {
     "setup": "node scripts/setup-env.mjs",
+    "doctor": "node scripts/doctor.mjs",
+    "predev": "node scripts/prepare-dev.mjs",
     "dev": "vite",
     "build": "tsc -b && vite build",
     "build:cloudflare": "node scripts/build-cloudflare.mjs",

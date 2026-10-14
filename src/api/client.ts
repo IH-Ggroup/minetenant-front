@@ -119,7 +119,7 @@ function responseError(status: number, payload: unknown): ApiError {
   );
 }
 
-/** Initialize the Laravel session/CSRF cookies without replaying a write. */
+/** Initialize the Hono session/CSRF cookies without replaying a write. */
 export async function initializeCsrfCookie(): Promise<void> {
   if (!csrfInitialization) {
     csrfInitialization = apiRequest<void>('/auth/csrf-cookie')

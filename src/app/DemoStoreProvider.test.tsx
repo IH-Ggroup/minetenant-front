@@ -23,7 +23,7 @@ beforeEach(() => {
   vi.mocked(logout).mockResolvedValue(undefined);
 });
 
-describe('Laravelセッションの状態管理', () => {
+describe('Honoセッションの状態管理', () => {
   it('初回は読み込み中にして、APIのユーザーを復元する', async () => {
     const { result } = renderHook(useDemoStore, { wrapper: DemoStoreProvider });
     expect(result.current.authStatus).toBe('loading');
@@ -38,7 +38,9 @@ describe('Laravelセッションの状態管理', () => {
     await waitFor(() =>
       expect(result.current.authStatus).toBe('authenticated'),
     );
-    act(() => result.current.saveListingDraft({ ...INITIAL_PRODUCTS[0] }));
+    act(() =>
+      result.current.saveListingDraft({ ...INITIAL_PRODUCTS[0], stock: 1 }),
+    );
     expect(result.current.listingDraft).not.toBeNull();
     act(() => notifications.unauthorized());
     expect(result.current.activeUser).toBeNull();
@@ -51,7 +53,9 @@ describe('Laravelセッションの状態管理', () => {
     await waitFor(() =>
       expect(result.current.authStatus).toBe('authenticated'),
     );
-    act(() => result.current.saveListingDraft({ ...INITIAL_PRODUCTS[0] }));
+    act(() =>
+      result.current.saveListingDraft({ ...INITIAL_PRODUCTS[0], stock: 1 }),
+    );
     await act(() => result.current.logout());
     expect(result.current.activeUser).toBeNull();
     expect(result.current.listingDraft).toBeNull();

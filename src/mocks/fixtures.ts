@@ -34,7 +34,7 @@ export const INITIAL_PRODUCTS: Product[] = [
     description:
       '深い青色と、ゆったりしたシルエットが特徴のパーカーです。普段使いしやすい厚さに仕上げました。',
     price: 6800,
-    stock: 3,
+    status: 'available',
     category: 'fashion',
     theme: 'ocean',
     emoji: '🧥',
@@ -48,7 +48,7 @@ export const INITIAL_PRODUCTS: Product[] = [
     description:
       '天然木の表情を残して仕上げた小さなスツールです。椅子としても飾り台としても使えます。',
     price: 4200,
-    stock: 2,
+    status: 'available',
     category: 'interior',
     theme: 'forest',
     emoji: '🪵',
@@ -62,7 +62,7 @@ export const INITIAL_PRODUCTS: Product[] = [
     description:
       '紫色の表紙に箔押しを施したハンドメイドノート。冒険の記録やアイデア帳におすすめです。',
     price: 1800,
-    stock: 0,
+    status: 'sold',
     category: 'hobby',
     theme: 'amethyst',
     emoji: '📕',
@@ -76,7 +76,7 @@ export const INITIAL_PRODUCTS: Product[] = [
     description:
       '光を受けてきらめく鉱石をイメージしたペンダントです。長さを調整できるコードを使用しています。',
     price: 3200,
-    stock: 4,
+    status: 'available',
     category: 'accessory',
     theme: 'sunset',
     emoji: '💎',
@@ -90,7 +90,7 @@ export const INITIAL_PRODUCTS: Product[] = [
     description:
       '丈夫な帆布で作った道具入れです。内側を仕切り、細かな道具も迷子になりにくくしました。',
     price: 5800,
-    stock: 1,
+    status: 'available',
     category: 'tool',
     theme: 'sand',
     emoji: '👜',
@@ -104,7 +104,7 @@ export const INITIAL_PRODUCTS: Product[] = [
     description:
       '森の遺跡に置かれたランタンをイメージした小型照明です。やわらかな暖色の光が広がります。',
     price: 7500,
-    stock: 5,
+    status: 'available',
     category: 'interior',
     theme: 'moss',
     emoji: '🏮',

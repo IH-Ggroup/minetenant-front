@@ -61,7 +61,7 @@ export function CheckoutPage() {
   }
 
   const cannotPurchase =
-    product.stock === 0 || product.sellerId === activeUser?.id;
+    product.status === 'sold' || product.sellerId === activeUser?.id;
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
