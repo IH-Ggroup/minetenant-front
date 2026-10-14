@@ -15,10 +15,10 @@ export function EmptyState({
 }: EmptyStateProps) {
   return (
     <section className="empty-state">
-      {icon && <div className="empty-state__icon">{icon}</div>}
-      <h2>{title}</h2>
-      <p>{description}</p>
-      {action && <div>{action}</div>}
+      {icon ? ( <div className="empty-state__icon">{icon}</div> ) : null}
+      <h2 className="empty-state__title">{title}</h2>
+      <p className="empty-state__des">{description}</p>
+      {action ? ( <div className="empty-state__action">{action}</div> ) : null}
     </section>
   );
 }

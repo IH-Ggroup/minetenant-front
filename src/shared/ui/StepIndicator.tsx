@@ -25,7 +25,7 @@ export function StepIndicator({
               )}
               aria-current={stepNumber === currentStep ? 'step' : undefined}
             >
-              <span>{stepNumber}</span>
+              <span className="step-number">{stepNumber}</span>
               {step}
             </li>
           );
