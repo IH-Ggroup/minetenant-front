@@ -92,9 +92,7 @@ export function MyPage() {
         <div className="panel__heading">
           <div>
             <h2>{activeUser.displayName}</h2>
-            {activeUser.displayName !== activeUser.username && (
-              <p>@{activeUser.username}</p>
-            )}
+            <p>@{activeUser.username}</p>
             <p>{activeUser.roleLabel}</p>
           </div>
 
