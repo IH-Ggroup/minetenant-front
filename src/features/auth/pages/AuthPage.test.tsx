@@ -86,7 +86,7 @@ describe('AuthPage', () => {
     const password = screen.getByLabelText('パスワード');
     expect(username).toBeRequired();
     expect(username).toHaveAttribute('type', 'text');
-    expect(username).toHaveAttribute('maxlength', '120'); //文字数制限後で忘れない 下のメアド関連読む
+    expect(username).toHaveAttribute('maxlength', '120');
     expect(password).toBeRequired();
     expect(password).toHaveAttribute('maxlength', '72');
     expect(password).not.toHaveAttribute('minlength');
@@ -115,7 +115,7 @@ describe('AuthPage', () => {
       password: 'password123',
     });
     expect(
-      screen.getByRole('heading', { name: 'ログイン' }), //
+      screen.getByRole('heading', { name: 'ログイン' }),
     ).toBeInTheDocument();
     expect(screen.getByRole('button', { name: '処理中…' })).toBeDisabled();
     expect(screen.getByLabelText('ユーザー名')).toBeDisabled();
@@ -138,6 +138,28 @@ describe('AuthPage', () => {
 
     expect(auth.login).toHaveBeenCalledOnce();
     await act(async () => request.resolve());
+  });
+  it('429ではRetry-Afterの待機時間をフォームに表示し、自動再送しない', async () => {
+    auth.login.mockRejectedValueOnce(
+      new ApiError(
+        429,
+        '操作の回数が多すぎます。',
+        'TOO_MANY_REQUESTS',
+        {},
+        '120',
+      ),
+    );
+    renderAuth();
+    fillCredentials();
+    fireEvent.click(
+      screen.getByRole('button', {
+        name: 'ログインして商品を見る',
+      }),
+    );
+    expect(await screen.findByRole('alert')).toHaveTextContent(
+      '操作の回数が多すぎます。 120秒ほど待ってから再度お試しください。',
+    );
+    expect(auth.login).toHaveBeenCalledOnce();
   });
 
   it.each(['/login', '/signup'])(
@@ -420,5 +442,37 @@ describe('AuthPage', () => {
     expect(
       await screen.findByRole('heading', { name: '/products' }),
     ).toBeInTheDocument();
+  });
+  it('重複ユーザー名のエラーを表示する', async () => {
+    auth.register.mockRejectedValueOnce(
+      new ApiError(422, '入力内容を確認してください。', undefined, {
+        username: ['このユーザー名は既に使用されています。'],
+      }),
+    );
+
+    renderAuth('/signup');
+    fillRegistration();
+
+    fireEvent.click(screen.getByRole('button', { name: '登録する' }));
+
+    expect(
+      await screen.findByText('このユーザー名は既に使用されています。'),
+    ).toBeInTheDocument();
+  });
+
+  it.each([
+    [401, '認証に失敗しました。'],
+    [419, 'セッションの有効期限が切れました。'],
+  ])('%i の認証エラーを分かりやすく表示する', async (status, message) => {
+    auth.login.mockRejectedValueOnce(new ApiError(status, message));
+
+    renderAuth();
+    fillCredentials();
+
+    fireEvent.click(
+      screen.getByRole('button', { name: 'ログインして商品を見る' }),
+    );
+
+    expect(await screen.findByRole('alert')).toHaveTextContent(message);
   });
 });

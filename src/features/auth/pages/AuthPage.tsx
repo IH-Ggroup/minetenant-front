@@ -152,6 +152,13 @@ function AuthForm({ isSignup }: { isSignup: boolean }) {
         visibleFields.some((field) => error.errors[field]?.length)
       ) {
         setFieldErrors(error.errors);
+      } else if (error instanceof ApiError && error.status === 429) {
+        const seconds = Number(error.retryAfter);
+        setSubmitError(
+          error.retryAfter && Number.isFinite(seconds) && seconds > 0
+            ? `${error.message} ${seconds}秒ほど待ってから再度お試しください。`
+            : error.message,
+        );
       } else {
         setSubmitError(
           error instanceof ApiError

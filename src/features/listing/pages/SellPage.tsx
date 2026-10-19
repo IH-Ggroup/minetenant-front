@@ -43,7 +43,7 @@ export function SellPage() {
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    if (!activeUser) {
+    if (!activeUser || !activeUser.storeId) {
       return;
     }
 

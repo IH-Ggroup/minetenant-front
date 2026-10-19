@@ -13,7 +13,7 @@ export interface SessionUser {
   role: UserRole;
   roleLabel: string;
   avatarInitial: string;
-  storeId: string;
+  storeId: string | null;
 }
 
 export interface Product {

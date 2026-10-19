@@ -149,4 +149,53 @@ describe('Laravelセッションの状態管理', () => {
     await act(() => result.current.login(input));
     expect(result.current.activeUser?.id).toBe(DEMO_USERS[1].id);
   });
+  it('登録後にログアウトし、同じ認証情報で再ログインできる', async () => {
+    vi.mocked(getCurrentUser).mockResolvedValueOnce(null);
+
+    vi.mocked(register).mockResolvedValueOnce({
+      ...DEMO_USERS[1],
+    });
+
+    vi.mocked(login).mockResolvedValueOnce({
+      ...DEMO_USERS[1],
+    });
+
+    const { result } = renderHook(useDemoStore, {
+      wrapper: DemoStoreProvider,
+    });
+
+    // 初回のセッション復元が完了するまで待つ
+    await waitFor(() =>
+      expect(result.current.authStatus).toBe('unauthenticated'),
+    );
+
+    const credentials = {
+      username: 'newuser',
+      password: 'password123',
+    };
+
+    // 登録
+    await act(() =>
+      result.current.register({
+        ...credentials,
+        displayName: '山田 太郎',
+        passwordConfirmation: credentials.password,
+      }),
+    );
+
+    expect(result.current.authStatus).toBe('authenticated');
+
+    // ログアウト
+    await act(() => result.current.logout());
+
+    expect(result.current.authStatus).toBe('unauthenticated');
+    expect(result.current.activeUser).toBeNull();
+
+    // 同じ認証情報で再ログイン
+    await act(() => result.current.login(credentials));
+
+    expect(login).toHaveBeenCalledWith(credentials);
+    expect(result.current.authStatus).toBe('authenticated');
+    expect(result.current.activeUser?.id).toBe(DEMO_USERS[1].id);
+  });
 });

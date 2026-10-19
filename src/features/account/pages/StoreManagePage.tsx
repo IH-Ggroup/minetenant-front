@@ -16,7 +16,7 @@ export function StoreManagePage() {
   const [dashboard, setDashboard] = useState<StoreDashboard | null>(null);
 
   useEffect(() => {
-    if (!activeUser) {
+    if (!activeUser || activeUser.storeId === null) {
       return;
     }
 

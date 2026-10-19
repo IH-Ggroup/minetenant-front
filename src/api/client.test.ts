@@ -1,4 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { apiRequest } from '@/api/client';
 
 const BASE_URL = 'http://localhost:8787/api/v1';
 const fetchMock = vi.fn<typeof fetch>();
@@ -123,7 +124,7 @@ describe('API client', () => {
         {
           message: '入力内容を確認してください。',
           code: 'invalid_purchase',
-          errors: { email: ['入力が必要です。'], malformed: 'not an array' },
+          errors: { username: ['入力が必要です。'], malformed: 'not an array' },
         },
         422,
       ),
@@ -137,7 +138,7 @@ describe('API client', () => {
       status: 422,
       message: '入力内容を確認してください。',
       code: 'invalid_purchase',
-      errors: { email: ['入力が必要です。'] },
+      errors: { username: ['入力が必要です。'] },
     });
   });
 
@@ -227,5 +228,41 @@ describe('API client', () => {
       status: 200,
       code: 'INVALID_RESPONSE',
     });
+  });
+  it('429ではRetry-Afterを保持し、リクエストを自動再送しない', async () => {
+    document.cookie = 'XSRF-TOKEN=test-token';
+    const fetchMock = vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce(
+      new Response(
+        JSON.stringify({
+          message: '操作の回数が多すぎます。',
+          code: 'TOO_MANY_REQUESTS',
+        }),
+        {
+          status: 429,
+          headers: {
+            'Content-Type': 'application/json',
+            'Retry-After': '120',
+          },
+        },
+      ),
+    );
+    try {
+      await expect(
+        apiRequest('/auth/login', {
+          method: 'POST',
+          body: JSON.stringify({
+            username: 'test-user',
+            password: 'test-password',
+          }),
+        }),
+      ).rejects.toMatchObject({
+        name: 'ApiError',
+        status: 429,
+        retryAfter: '120',
+      });
+      expect(fetchMock).toHaveBeenCalledTimes(1);
+    } finally {
+      fetchMock.mockRestore();
+    }
   });
 });

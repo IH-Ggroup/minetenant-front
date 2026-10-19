@@ -5,7 +5,7 @@ import {
   advanceAuthGeneration,
   apiRequest,
   initializeCsrfCookie,
-} from './client';
+} from '@/api/client';
 
 export type LoginInput = {
   username: string;

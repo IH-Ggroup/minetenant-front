@@ -80,9 +80,11 @@ export function MyPage() {
         title="マイページ"
         description="プロフィールと最近の取引を確認するための基本画面です。"
         actions={
-          <ButtonLink to={paths.sell} leadingIcon={<PackagePlus size={18} />}>
-            商品を出品
-          </ButtonLink>
+          activeUser.storeId !== null ? (
+            <ButtonLink to={paths.sell} leadingIcon={<PackagePlus size={18} />}>
+              商品を出品
+            </ButtonLink>
+          ) : undefined
         }
       />
 
@@ -100,13 +102,20 @@ export function MyPage() {
         </div>
 
         <div className="review-actions">
-          <ButtonLink to={paths.store(activeUser.storeId)} variant="secondary">
-            店舗ページを見る
-          </ButtonLink>
+          {activeUser.storeId !== null && (
+            <>
+              <ButtonLink
+                to={paths.store(activeUser.storeId)}
+                variant="secondary"
+              >
+                店舗ページを見る
+              </ButtonLink>
 
-          <ButtonLink to={paths.storeManage} variant="secondary">
-            店舗を管理する
-          </ButtonLink>
+              <ButtonLink to={paths.storeManage} variant="secondary">
+                店舗を管理する
+              </ButtonLink>
+            </>
+          )}
         </div>
       </section>
 
