@@ -198,4 +198,50 @@ describe('Laravelセッションの状態管理', () => {
     expect(result.current.authStatus).toBe('authenticated');
     expect(result.current.activeUser?.id).toBe(DEMO_USERS[1].id);
   });
+  it.each([
+    {
+      name: '表示名が指定されている場合',
+      displayName: '山田 みどり',
+    },
+    {
+      name: '表示名が省略された場合',
+      displayName: 'demo_user',
+    },
+    {
+      name: '表示名が null の場合',
+      displayName: 'demo_user',
+    },
+    {
+      name: '表示名が空白のみの場合',
+      displayName: 'demo_user',
+    },
+  ])(
+    'ログインAPIのレスポンスの表示名を保持する（$name）',
+    async ({ displayName }) => {
+      const user: SessionUser = {
+        ...DEMO_USERS[1],
+        displayName,
+      };
+
+      vi.mocked(login).mockResolvedValueOnce(user);
+
+      const { result } = renderHook(useDemoStore, {
+        wrapper: DemoStoreProvider,
+      });
+
+      await waitFor(() =>
+        expect(result.current.authStatus).toBe('authenticated'),
+      );
+
+      await act(async () => {
+        await result.current.login({
+          username: 'seller',
+          password: 'password',
+        });
+      });
+
+      expect(result.current.activeUser).toEqual(user);
+      expect(result.current.activeUser?.displayName).toBe(displayName);
+    },
+  );
 });
