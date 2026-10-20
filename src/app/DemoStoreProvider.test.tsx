@@ -164,7 +164,6 @@ describe('Laravelセッションの状態管理', () => {
       wrapper: DemoStoreProvider,
     });
 
-    // 初回のセッション復元が完了するまで待つ
     await waitFor(() =>
       expect(result.current.authStatus).toBe('unauthenticated'),
     );
@@ -204,44 +203,33 @@ describe('Laravelセッションの状態管理', () => {
       displayName: '山田 みどり',
     },
     {
-      name: '表示名が省略された場合',
-      displayName: 'demo_user',
-    },
-    {
       name: '表示名が null の場合',
       displayName: 'demo_user',
     },
-    {
-      name: '表示名が空白のみの場合',
-      displayName: 'demo_user',
-    },
-  ])(
-    'ログインAPIのレスポンスの表示名を保持する（$name）',
-    async ({ displayName }) => {
-      const user: SessionUser = {
-        ...DEMO_USERS[1],
-        displayName,
-      };
+  ])('ログインAPIのレスポンスの表示名を保持する', async ({ displayName }) => {
+    const user: SessionUser = {
+      ...DEMO_USERS[1],
+      displayName,
+    };
 
-      vi.mocked(login).mockResolvedValueOnce(user);
+    vi.mocked(login).mockResolvedValueOnce(user);
 
-      const { result } = renderHook(useDemoStore, {
-        wrapper: DemoStoreProvider,
+    const { result } = renderHook(useDemoStore, {
+      wrapper: DemoStoreProvider,
+    });
+
+    await waitFor(() =>
+      expect(result.current.authStatus).toBe('authenticated'),
+    );
+
+    await act(async () => {
+      await result.current.login({
+        username: 'seller',
+        password: 'password',
       });
+    });
 
-      await waitFor(() =>
-        expect(result.current.authStatus).toBe('authenticated'),
-      );
-
-      await act(async () => {
-        await result.current.login({
-          username: 'seller',
-          password: 'password',
-        });
-      });
-
-      expect(result.current.activeUser).toEqual(user);
-      expect(result.current.activeUser?.displayName).toBe(displayName);
-    },
-  );
+    expect(result.current.activeUser).toEqual(user);
+    expect(result.current.activeUser?.displayName).toBe(displayName);
+  });
 });
