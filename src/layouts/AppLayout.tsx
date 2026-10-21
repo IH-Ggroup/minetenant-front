@@ -45,7 +45,9 @@ export function AppLayout() {
               <LogoutButton />
             </div>
           ) : authStatus === 'unauthenticated' ? (
-            <NavLink className="login-button" to={paths.login}>ログイン</NavLink>
+            <NavLink className="login-button" to={paths.login}>
+              ログイン
+            </NavLink>
           ) : null}
         </div>
       </header>

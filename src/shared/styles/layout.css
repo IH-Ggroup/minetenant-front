@@ -25,8 +25,8 @@
   font-size: var(--size-detail);
 }
 
-.main-nav__link{
-  background-color: #B6A789;
+.main-nav__link {
+  background-color: #b6a789;
   width: 70px;
   height: 70px;
   text-align: center;
@@ -52,22 +52,22 @@
   outline: none;
 }
 
-.app-logo{
+.app-logo {
   color: black;
   font-size: 30px;
 }
 
 .header-user,
-.login-button{
+.login-button {
   display: flex;
   align-items: center;
   gap: 12px;
   margin-left: auto;
 }
-.login-button{
+.login-button {
   background-color: var(--color-mypage-button);
 }
 
-.username{
+.username {
   font-size: var(--size-subtitle);
 }
