@@ -6,8 +6,8 @@ import { LogoutButton } from '@/features/auth/components/LogoutButton';
 import { classNames } from '@/shared/lib/class-names';
 
 const navItems = [
-  { to: paths.products, label: '商品一覧' },
-  { to: paths.sell, label: '商品を出品' },
+  { to: paths.products, label: 'ホーム' },
+  { to: paths.sell, label: '出品' },
   { to: paths.myPage, label: 'マイページ' },
 ];
 
@@ -23,7 +23,7 @@ export function AppLayout() {
       <header className="app-header">
         <div className="app-header__inner">
           <NavLink className="brand" to={paths.products}>
-            <strong>MineTenant</strong>
+            <strong className="app-logo">MineTenant</strong>
           </NavLink>
 
           <nav className="main-nav" aria-label="メインナビゲーション">
@@ -40,19 +40,15 @@ export function AppLayout() {
             ))}
           </nav>
           {activeUser ? (
-            <div>
-              <span>{activeUser.name}</span>
+            <div className="header-user">
+              <span className="username">{activeUser.name}</span>
               <LogoutButton />
             </div>
           ) : authStatus === 'unauthenticated' ? (
-            <NavLink to={paths.login}>ログイン</NavLink>
+            <NavLink className="login-button" to={paths.login}>ログイン</NavLink>
           ) : null}
         </div>
       </header>
-
-      <p className="prototype-note">
-        画面設計用の土台です。デザインはこれから作成します。
-      </p>
 
       <main id="main-content" className="app-main" tabIndex={-1}>
         <Outlet />
