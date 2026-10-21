@@ -22,11 +22,11 @@ export function SellReviewPage() {
   const draft = listingDraft;
 
   useEffect(() => {
-    if (!activeUser) {
+    if (!activeUser || activeUser.storeId === null) {
       return;
     }
 
-    getStore(activeUser.storeId) //getStore
+    getStore(activeUser.storeId)
       .then(setStore)
       .catch(() => {
         setError('店舗情報を取得できませんでした。');
@@ -46,6 +46,11 @@ export function SellReviewPage() {
 
   const handlePublish = async () => {
     if (isPublishing) return;
+
+    if (!activeUser || activeUser.storeId === null) {
+      setError('出品には店舗の登録が必要です。');
+      return;
+    }
     setIsPublishing(true);
     setError('');
     try {

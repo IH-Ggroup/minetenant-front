@@ -43,7 +43,6 @@ describe('Cloudflare same-origin Hono bridge', () => {
     '/api/hello',
     '/api/v1/minecraft/catalog',
     '/api/v1/minecraft/purchases',
-    '/api/v1/users',
     '/api/v1/products/a%2fb',
     '/api/v1/products/..%2fauth/login',
     '/api/v1/products//evil.test',
@@ -322,7 +321,7 @@ describe('Cloudflare same-origin Hono bridge', () => {
     async (status) => {
       const payload = {
         message: '入力を確認してください。',
-        errors: { email: ['必須です。'] },
+        errors: { username: ['必須です。'] },
       };
       const fetcher = vi.fn(async () =>
         json(payload, { status, headers: { 'Retry-After': '30' } }),

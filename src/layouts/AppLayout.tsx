@@ -7,7 +7,6 @@ import { classNames } from '@/shared/lib/class-names';
 
 const navItems = [
   { to: paths.products, label: '商品一覧' },
-  { to: paths.sell, label: '商品を出品' },
   { to: paths.myPage, label: 'マイページ' },
 ];
 
@@ -38,10 +37,21 @@ export function AppLayout() {
                 {item.label}
               </NavLink>
             ))}
+
+            {activeUser?.storeId != null && (
+              <NavLink
+                to={paths.sell}
+                className={({ isActive }) =>
+                  classNames('main-nav__link', isActive && 'is-active')
+                }
+              >
+                商品を出品
+              </NavLink>
+            )}
           </nav>
           {activeUser ? (
             <div>
-              <span>{activeUser.name}</span>
+              <span>{activeUser.displayName}</span>
               <LogoutButton />
             </div>
           ) : authStatus === 'unauthenticated' ? (

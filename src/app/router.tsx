@@ -23,6 +23,7 @@ import { SellSyncPage } from '@/features/listing/pages/SellSyncPage';
 import { NotFoundPage } from '@/features/system/pages/NotFoundPage';
 import { AppLayout } from '@/layouts/AppLayout';
 import { AuthLayout } from '@/layouts/AuthLayout';
+import { RequireStore } from '@/features/auth/components/RequireStore';
 
 export const routeObjects: RouteObject[] = [
   {
@@ -59,14 +60,19 @@ export const routeObjects: RouteObject[] = [
                 element: <PurchaseCompletePage />,
               },
               { path: 'mypage', element: <MyPage /> },
-              { path: 'sell', element: <SellPage /> },
-              { path: 'sell/review', element: <SellReviewPage /> },
-              { path: 'sell/sync/:productId', element: <SellSyncPage /> },
               {
-                path: 'sell/complete/:productId',
-                element: <SellCompletePage />,
+                element: <RequireStore />,
+                children: [
+                  { path: 'sell', element: <SellPage /> },
+                  { path: 'sell/review', element: <SellReviewPage /> },
+                  { path: 'sell/sync/:productId', element: <SellSyncPage /> },
+                  {
+                    path: 'sell/complete/:productId',
+                    element: <SellCompletePage />,
+                  },
+                  { path: 'store/manage', element: <StoreManagePage /> },
+                ],
               },
-              { path: 'store/manage', element: <StoreManagePage /> },
             ],
           },
           { path: '*', element: <NotFoundPage /> },
