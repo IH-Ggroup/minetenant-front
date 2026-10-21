@@ -16,7 +16,11 @@ export async function getProducts(storeId?: string): Promise<Product[]> {
     params.set('storeId', storeId);
   }
   const query = params.toString();
-  return apiRequest<Product[]>(`/products${query ? `?${query}` : ''}`);
+  const products = await apiRequest<Product[]>(
+    `/products${query ? `?${query}` : ''}`,
+  );
+  products.forEach(validateProduct);
+  return products;
 }
 
 /* 商品を出品  */
@@ -70,7 +74,7 @@ export async function getStore(storeId: string): Promise<Store> {
   return apiRequest<Store>(`/stores/${encodeURIComponent(storeId)}`);
 }
 
-/* 店舗集計未使用 */
+/* 店舗集計 */
 export async function getStoreDashboard(
   storeId: string,
 ): Promise<StoreDashboard> {
@@ -78,12 +82,25 @@ export async function getStoreDashboard(
     `/stores/${encodeURIComponent(storeId)}/dashboard`,
   );
 }
+
 /* 商品詳細 */
 export async function getProduct(productId: string): Promise<Product> {
-  return apiRequest<Product>(`/products/${encodeURIComponent(productId)}`);
+  const product = await apiRequest<Product>(
+    `/products/${encodeURIComponent(productId)}`,
+  );
+  validateProduct(product);
+  return product;
 }
 
 /* 取引履歴を取得 */
 export async function getTransactions(): Promise<Transaction[]> {
   return apiRequest<Transaction[]>('/transactions');
+}
+
+// 追加
+function validateProduct(product: Product): Product {
+  if (product.status !== 'available' && product.status !== 'sold') {
+    throw new Error(`Invalid product status: ${product.status}`);
+  }
+  return product;
 }

@@ -51,7 +51,7 @@ export function ProductDetailPage() {
     );
   }
 
-  const isSoldOut = product.stock === 0;
+  const isSoldOut = product.status === 'sold';
   const isOwnProduct =
     activeUser !== null && product.sellerId === activeUser.id;
 
@@ -78,7 +78,7 @@ export function ProductDetailPage() {
         <div className="product-detail__content">
           <h1>{product.name}</h1>
           <p className="product-detail__price">{formatPrice(product.price)}</p>
-          <p>{isSoldOut ? '売り切れ' : `在庫 ${product.stock}点`}</p>
+          <p>{isSoldOut ? '売り切れ' : `販売中`}</p>
 
           <div className="product-detail__description">
             <h2>商品の説明</h2>
@@ -96,9 +96,11 @@ export function ProductDetailPage() {
           )}
 
           {isOwnProduct ? (
-            <ButtonLink to={paths.storeManage} variant="secondary" fullWidth>
-              自分の出品を管理する
-            </ButtonLink>
+            activeUser?.storeId != null ? (
+              <ButtonLink to={paths.storeManage} variant="secondary" fullWidth>
+                自分の出品を管理する
+              </ButtonLink>
+            ) : null
           ) : (
             <ButtonLink
               to={paths.checkout(product.id)}

@@ -13,16 +13,25 @@ import { useDemoStore } from '@/app/demo-store-context';
 import { paths } from '@/app/paths';
 import { Button } from '@/shared/ui/Button';
 
-type FieldName = 'name' | 'email' | 'password' | 'password_confirmation';
+type FieldName =
+  'username' | 'displayName' | 'password' | 'passwordConfirmation';
+
 type FieldErrors = Partial<Record<FieldName, string[]>>;
 
 interface AuthFieldProps extends InputHTMLAttributes<HTMLInputElement> {
   name: FieldName;
   label: string;
+  required?: boolean;
   errors?: string[];
 }
 
-function AuthField({ name, label, errors, ...props }: AuthFieldProps) {
+function AuthField({
+  name,
+  label,
+  errors,
+  required = true,
+  ...props
+}: AuthFieldProps) {
   const id = `auth-${name}`;
   const hasErrors = Boolean(errors?.length);
 
@@ -36,7 +45,7 @@ function AuthField({ name, label, errors, ...props }: AuthFieldProps) {
         id={id}
         className="input"
         name={name}
-        required
+        required={required}
         aria-invalid={hasErrors || undefined}
         aria-describedby={hasErrors ? `${id}-error` : undefined}
       />
@@ -95,8 +104,16 @@ function AuthForm({ isSignup }: { isSignup: boolean }) {
     }
 
     const data = new FormData(event.currentTarget);
-    const email = String(data.get('email') ?? '');
+    const username = String(data.get('username') ?? '');
     const password = String(data.get('password') ?? '');
+    const passwordConfirmation = String(data.get('passwordConfirmation') ?? '');
+
+    if (isSignup && password !== passwordConfirmation) {
+      setFieldErrors({
+        passwordConfirmation: ['パスワードが一致しません。'],
+      });
+      return;
+    }
     pending.current = true;
     setIsSubmitting(true);
     setFieldErrors({});
@@ -105,15 +122,13 @@ function AuthForm({ isSignup }: { isSignup: boolean }) {
     try {
       if (isSignup) {
         await register({
-          name: String(data.get('name') ?? ''),
-          email,
+          username: String(data.get('username') ?? ''),
+          displayName: String(data.get('displayName') ?? '') || null,
           password,
-          password_confirmation: String(
-            data.get('password_confirmation') ?? '',
-          ),
+          passwordConfirmation: String(data.get('passwordConfirmation') ?? ''),
         });
       } else {
-        await login({ email, password });
+        await login({ username, password });
       }
 
       if (mounted.current) {
@@ -128,8 +143,8 @@ function AuthForm({ isSignup }: { isSignup: boolean }) {
       }
 
       const visibleFields: FieldName[] = isSignup
-        ? ['name', 'email', 'password', 'password_confirmation']
-        : ['email', 'password'];
+        ? ['username', 'displayName', 'password', 'passwordConfirmation']
+        : ['username', 'password'];
 
       if (
         error instanceof ApiError &&
@@ -137,6 +152,13 @@ function AuthForm({ isSignup }: { isSignup: boolean }) {
         visibleFields.some((field) => error.errors[field]?.length)
       ) {
         setFieldErrors(error.errors);
+      } else if (error instanceof ApiError && error.status === 429) {
+        const seconds = Number(error.retryAfter);
+        setSubmitError(
+          error.retryAfter && Number.isFinite(seconds) && seconds > 0
+            ? `${error.message} ${seconds}秒ほど待ってから再度お試しください。`
+            : error.message,
+        );
       } else {
         setSubmitError(
           error instanceof ApiError
@@ -220,7 +242,7 @@ function AuthForm({ isSignup }: { isSignup: boolean }) {
         <p>
           {isSignup
             ? 'アカウント情報を入力してください。'
-            : 'メールアドレスとパスワードを入力してください。'}
+            : 'ユーザー名とパスワードを入力してください。'}
         </p>
       </div>
 
@@ -235,28 +257,28 @@ function AuthForm({ isSignup }: { isSignup: boolean }) {
           </div>
         ) : null}
 
+        <AuthField
+          name="username"
+          label="ユーザー名"
+          type="text"
+          autoComplete="username"
+          maxLength={120}
+          disabled={isSubmitting}
+          errors={fieldErrors.username}
+        />
+
         {isSignup ? (
           <AuthField
-            name="name"
-            label="名前"
+            name="displayName"
+            label="表示名"
+            required={false}
             type="text"
             autoComplete="name"
             maxLength={120}
             disabled={isSubmitting}
-            errors={fieldErrors.name}
+            errors={fieldErrors.displayName}
           />
         ) : null}
-
-        <AuthField
-          name="email"
-          label="メールアドレス"
-          type="email"
-          placeholder="example@minetenant.jp"
-          autoComplete="email"
-          maxLength={255}
-          disabled={isSubmitting}
-          errors={fieldErrors.email}
-        />
 
         <AuthField
           name="password"
@@ -274,14 +296,14 @@ function AuthForm({ isSignup }: { isSignup: boolean }) {
 
         {isSignup ? (
           <AuthField
-            name="password_confirmation"
+            name="passwordConfirmation"
             label="パスワード（確認）"
             type="password"
             autoComplete="new-password"
             minLength={8}
             maxLength={72}
             disabled={isSubmitting}
-            errors={fieldErrors.password_confirmation}
+            errors={fieldErrors.passwordConfirmation}
           />
         ) : null}
 

@@ -2,18 +2,21 @@ export class ApiError extends Error {
   readonly status: number;
   readonly code?: string;
   readonly errors: Record<string, string[]>;
+  readonly retryAfter?: string;
 
   constructor(
     status: number,
     message: string,
     code?: string,
     errors: Record<string, string[]> = {},
+    retryAfter?: string,
   ) {
     super(message);
     this.name = 'ApiError';
     this.status = status;
     this.code = code;
     this.errors = errors;
+    this.retryAfter = retryAfter;
   }
 }
 
@@ -90,7 +93,8 @@ function errorMessage(status: number): string {
   }
 }
 
-function responseError(status: number, payload: unknown): ApiError {
+function responseError(response: Response, payload: unknown): ApiError {
+  const { status } = response;
   const problem = isRecord(payload) ? payload : {};
   const errors: Record<string, string[]> = {};
 
@@ -116,10 +120,13 @@ function responseError(status: number, payload: unknown): ApiError {
         ? 'CSRF_TOKEN_MISMATCH'
         : undefined,
     errors,
+    status === 429
+      ? (response.headers.get('Retry-After') ?? undefined)
+      : undefined,
   );
 }
 
-/** Initialize the Laravel session/CSRF cookies without replaying a write. */
+/** Initialize the Hono session/CSRF cookies without replaying a write. */
 export async function initializeCsrfCookie(): Promise<void> {
   if (!csrfInitialization) {
     csrfInitialization = apiRequest<void>('/auth/csrf-cookie')
@@ -201,7 +208,7 @@ export async function apiRequest<T>(
   try {
     payload = await response.json();
   } catch {
-    if (!response.ok) throw responseError(response.status, undefined);
+    if (!response.ok) throw responseError(response, undefined);
     throw new ApiError(
       response.status,
       'APIから正しい形式の応答を受け取れませんでした。',
@@ -209,7 +216,7 @@ export async function apiRequest<T>(
     );
   }
 
-  if (!response.ok) throw responseError(response.status, payload);
+  if (!response.ok) throw responseError(response, payload);
   if (
     !isRecord(payload) ||
     !Object.prototype.hasOwnProperty.call(payload, 'data')

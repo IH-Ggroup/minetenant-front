@@ -1,5 +1,30 @@
 # MineTenant Frontend
 
+通常のcloneで、Hono版に対応した既定の`develop`ブランチを取得できます。
+
+```bash
+git clone https://github.com/IH-Ggroup/minetenant-front.git
+```
+
+## 最短起動
+
+`.nvmrc`に合わせたNode.js 22.22.2、npm 10以上、MySQL 8.0以上を用意します。
+MySQLを起動し、**バックエンドのフォルダ**で実行します。
+
+```bash
+npm run dev
+```
+
+Honoを起動したターミナルはそのままにして、別のターミナルの**フロントのフォルダ**で実行します。
+
+```bash
+npm run dev
+```
+
+初回または`package-lock.json`の更新後だけ、`npm run dev`が依存関係を`npm ci`で揃え、
+`.env.example`から`.env.local`を作ります。既存の`.env.local`は上書きしません。Viteが起動したら
+[http://localhost:5173](http://localhost:5173)を開いてください。
+
 MineTenant の画面遷移と API 連携を残し、デザイン担当者がここから見た目を作るための
 Vite + React + TypeScript 製の土台です。
 
@@ -39,26 +64,25 @@ Docker Desktopや旧PoCのプロジェクトは不要です。
 
 ### 初回だけ行うこと
 
-1. Node.js 22.22.2（推奨）とnpm 10以上、MySQL 8.4をインストールします。
+1. Node.js 22.22.2とnpm 10以上、MySQL 8.0以上をインストールします。
    `node -v`、`npm -v`、`mysql --version`で確認できます。利用できるNode.jsの正確な範囲は
    [`package.json`](package.json) の `engines` を確認してください。
 2. [バックエンドのREADME](https://github.com/IH-Ggroup/minetenant-backend/blob/develop/README.md)に沿って、
-   MySQLの開発用DBを準備します。続けて、バックエンドのフォルダで初回セットアップを行います。
+   MySQLを起動します。
 
    ```bash
-   npm ci
-   npm run setup
+   npm run dev
    ```
 
-3. このフロントのフォルダで初回セットアップを行います。
+3. このフロントのフォルダで起動します。
 
 ```bash
-npm ci
-npm run setup
+npm run dev
 ```
 
-フロントの`npm run setup`は`.env.example`をコピーして`.env.local`を作成します。
-Windows / macOS / Linux共通のコマンドです。既存の`.env.local`は上書きしません。
+フロントでは、初回の`npm run dev`が依存関係の導入と`.env.local`の作成を自動で行います。
+2回目以降は`package-lock.json`が変わらない限り導入済みの依存関係を使うため、毎回`npm ci`は実行されません。
+Windows / macOS / Linux共通で、既存の`.env.local`は上書きしません。
 
 接続先の初期値は次のとおりです。接続先を変えた場合は Vite を再起動してください。
 
@@ -96,12 +120,18 @@ Minecraft用トークンは書かず、Gitにも追加しません。DBへの接
 
 ### 起動に困ったとき
 
+まずフロントで`npm run doctor`を実行すると、`.env.local`、Honoの起動、商品APIとDBの応答を、
+設定値やパスワードを表示せず順に確認できます。通常の起動時に実行する必要はありません。
+
 - 画面に「APIの接続先が未設定です」と表示される：`.env.local`がない場合は、フロントのフォルダで
-  `npm run setup`を実行します。ある場合は`VITE_API_BASE_URL`の名前と値を確認します。変更後はViteを
+  もう一度`npm run dev`を実行します。ある場合は`VITE_API_BASE_URL`の名前と値を確認します。変更後はViteを
   `Ctrl + C`で止め、`npm run dev`で再起動してください。
 - 画面に「APIに接続できません」と表示される：
   [http://localhost:8787/api/hello](http://localhost:8787/api/hello)を直接開きます。表示できない場合は、
   MySQL、Honoの順に起動し、Hono側のターミナルに出たエラーを確認してください。
+- `npm run doctor`で`/api/v1/products`が`HTTP 500`になる：MySQLを起動し、バックエンドを
+  `Ctrl + C`で停止して`npm run dev`を再実行します。不足するDB・テーブルは起動時に自動準備されます。
+  それでも起動できない場合は、バックエンドのターミナルに表示された1件の案内に従ってください。
 - `Port 5173 is already in use`：既に起動しているフロントを終了してから再実行します。
 - `Port 8787 is already in use`：以前起動したAPIを終了します。別のAPIを8787番で同時に起動できません。
 - CookieやCORSのエラーになる：`localhost`と`127.0.0.1`を混在させていないか確認します。

@@ -6,13 +6,16 @@ export type ProductCategory =
 export type ProductTheme =
   'ocean' | 'forest' | 'amethyst' | 'sunset' | 'sand' | 'moss';
 
+export type ProductStatus = 'available' | 'sold';
+
 export interface SessionUser {
   id: string;
-  name: string;
+  username: string;
+  displayName: string;
   role: UserRole;
   roleLabel: string;
   avatarInitial: string;
-  storeId: string;
+  storeId: string | null;
 }
 
 export interface Product {
@@ -22,11 +25,11 @@ export interface Product {
   name: string;
   description: string;
   price: number;
-  stock: number;
+  status: ProductStatus;
   category: ProductCategory;
   theme: ProductTheme;
   emoji: string;
-  createdAt: string;
+  createdAt: string | null;
 }
 
 export interface Store {

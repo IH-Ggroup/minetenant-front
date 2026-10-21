@@ -7,7 +7,7 @@ import { classNames } from '@/shared/lib/class-names';
 
 const navItems = [
   { to: paths.products, label: 'ホーム' },
-  { to: paths.sell, label: '出品' },
+  { to: paths.sell, label: '出品', requiresStore: true },
   { to: paths.myPage, label: 'マイページ' },
 ];
 
@@ -27,21 +27,25 @@ export function AppLayout() {
           </NavLink>
 
           <nav className="main-nav" aria-label="メインナビゲーション">
-            {navItems.map((item) => (
-              <NavLink
-                key={item.to}
-                to={item.to}
-                className={({ isActive }) =>
-                  classNames('main-nav__link', isActive && 'is-active')
-                }
-              >
-                {item.label}
-              </NavLink>
-            ))}
+            {navItems
+              .filter(
+                (item) => !item.requiresStore || activeUser?.storeId != null,
+              )
+              .map((item) => (
+                <NavLink
+                  key={item.to}
+                  to={item.to}
+                  className={({ isActive }) =>
+                    classNames('main-nav__link', isActive && 'is-active')
+                  }
+                >
+                  {item.label}
+                </NavLink>
+              ))}
           </nav>
           {activeUser ? (
             <div className="header-user">
-              <span className="username">{activeUser.name}</span>
+              <span className="username">{activeUser.displayName}</span>
               <LogoutButton />
             </div>
           ) : authStatus === 'unauthenticated' ? (

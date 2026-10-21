@@ -25,8 +25,8 @@ export function CheckoutPage() {
 
   const [isLoading, setIsLoading] = useState(true);
   const [draft, setDraft] = useState<CheckoutDraft>({
-    ...DEFAULT_CHECKOUT_DRAFT, //住所
-    name: activeUser?.name ?? '',
+    ...DEFAULT_CHECKOUT_DRAFT,
+    name: activeUser?.displayName ?? '',
   });
 
   useEffect(() => {
@@ -61,7 +61,7 @@ export function CheckoutPage() {
   }
 
   const cannotPurchase =
-    product.stock === 0 || product.sellerId === activeUser?.id;
+    product.status === 'sold' || product.sellerId === activeUser?.id;
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();

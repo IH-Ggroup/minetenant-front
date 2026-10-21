@@ -11,7 +11,7 @@ interface ProductCardProps {
 }
 
 export function ProductCard({ product, store }: ProductCardProps) {
-  const isSoldOut = product.stock === 0;
+  const isSoldOut = product.status === 'sold';
 
   return (
     <article className="product-card">
@@ -33,7 +33,7 @@ export function ProductCard({ product, store }: ProductCardProps) {
         <p className="product-card__store">{store?.name ?? '店舗情報なし'}</p>
         <div className="product-card__footer">
           <strong>{formatPrice(product.price)}</strong>
-          <span>{isSoldOut ? '売り切れ' : `在庫 ${product.stock}点`}</span>
+          <span>{isSoldOut ? '売り切れ' : `販売中`}</span>
         </div>
       </div>
     </article>

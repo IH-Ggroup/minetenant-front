@@ -28,7 +28,7 @@ function json(value = { data: [] }, init = {}) {
 
 afterEach(() => vi.useRealTimers());
 
-describe('Cloudflare same-origin Laravel bridge', () => {
+describe('Cloudflare same-origin Hono bridge', () => {
   it('serves frontend routes via the SPA assets binding without an API origin', async () => {
     const bindings = env({ API_ORIGIN: undefined });
     const fetcher = vi.fn();
@@ -43,7 +43,6 @@ describe('Cloudflare same-origin Laravel bridge', () => {
     '/api/hello',
     '/api/v1/minecraft/catalog',
     '/api/v1/minecraft/purchases',
-    '/api/v1/users',
     '/api/v1/products/a%2fb',
     '/api/v1/products/..%2fauth/login',
     '/api/v1/products//evil.test',
@@ -112,7 +111,7 @@ describe('Cloudflare same-origin Laravel bridge', () => {
         headers: {
           Origin: FRONTEND,
           'Content-Type': 'application/json',
-          Cookie: 'minetenant_session=secret; XSRF-TOKEN=csrf',
+          Cookie: 'minetenant_hono_session=secret; XSRF-TOKEN=csrf',
           'X-XSRF-TOKEN': 'csrf',
           'X-MineTenant-Origin-Token': 'forged',
           'X-Forwarded-Host': 'evil.test',
@@ -133,7 +132,7 @@ describe('Cloudflare same-origin Laravel bridge', () => {
     expect(new TextDecoder().decode(options.body)).toBe('{"name":"商品"}');
     expect(options.headers.get('X-XSRF-TOKEN')).toBe('csrf');
     expect(options.headers.get('Cookie')).toContain(
-      'minetenant_session=secret',
+      'minetenant_hono_session=secret',
     );
     expect(options.headers.get('X-MineTenant-Origin-Token')).toBe(TOKEN);
     expect(options.headers.get('X-Forwarded-Host')).toBe(
@@ -278,7 +277,7 @@ describe('Cloudflare same-origin Laravel bridge', () => {
     expect(fetcher).not.toHaveBeenCalled();
   });
 
-  it('preserves separate Laravel cookies and expiration but rewrites their public scope', async () => {
+  it('preserves separate Hono cookies and expiration but rewrites their public scope', async () => {
     const upstreamHeaders = new Headers();
     upstreamHeaders.append(
       'Set-Cookie',
@@ -286,10 +285,10 @@ describe('Cloudflare same-origin Laravel bridge', () => {
     );
     upstreamHeaders.append(
       'Set-Cookie',
-      'minetenant_session=session; Max-Age=0; path=/; HttpOnly; Secure; SameSite=Strict',
+      'minetenant_hono_session=session; Max-Age=0; path=/; HttpOnly; Secure; SameSite=Strict',
     );
     upstreamHeaders.set('Access-Control-Allow-Origin', 'https://other.test');
-    upstreamHeaders.set('X-Powered-By', 'PHP');
+    upstreamHeaders.set('X-Powered-By', 'upstream-runtime');
     const fetcher = vi.fn(
       async () => new Response(null, { status: 204, headers: upstreamHeaders }),
     );
@@ -318,11 +317,11 @@ describe('Cloudflare same-origin Laravel bridge', () => {
   });
 
   it.each([401, 403, 404, 409, 419, 422, 429])(
-    'preserves Laravel JSON errors and status %s',
+    'preserves Hono JSON errors and status %s',
     async (status) => {
       const payload = {
         message: '入力を確認してください。',
-        errors: { email: ['必須です。'] },
+        errors: { username: ['必須です。'] },
       };
       const fetcher = vi.fn(async () =>
         json(payload, { status, headers: { 'Retry-After': '30' } }),
