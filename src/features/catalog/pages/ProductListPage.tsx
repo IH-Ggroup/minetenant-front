@@ -1,13 +1,13 @@
 import { PackageSearch, Plus, Search } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { getProducts } from '@/api/products';
+import { useDemoStore } from '@/app/demo-store-context';
 import { paths } from '@/app/paths';
 import { ProductCard } from '@/features/catalog/components/ProductCard';
 import { ButtonLink } from '@/shared/ui/Button';
 import { EmptyState } from '@/shared/ui/EmptyState';
 import { PageHeader } from '@/shared/ui/PageHeader';
 import type { Product } from '@/domain/models';
-import { useDemoStore } from '@/app/demo-store-context';
 
 export function ProductListPage() {
   const { activeUser } = useDemoStore();
