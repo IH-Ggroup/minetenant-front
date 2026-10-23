@@ -3,7 +3,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { getCurrentUser, login, logout } from '@/api/auth';
 import { ApiError } from '@/api/client';
-import { getProducts } from '@/api/products';
+import { getProducts, getStore } from '@/api/products';
 import { DEMO_USERS, INITIAL_PRODUCTS } from '@/mocks/fixtures';
 import { renderApp } from '@/test/render-app';
 
@@ -27,8 +27,8 @@ describe('MineTenant routes', () => {
     const loginButton = await screen.findByRole('button', {
       name: 'ログインして商品を見る',
     });
-    fireEvent.change(screen.getByLabelText('メールアドレス'), {
-      target: { value: 'demo@minetenant.jp' },
+    fireEvent.change(screen.getByLabelText('ユーザー名'), {
+      target: { value: 'demo_user' },
     });
     fireEvent.change(screen.getByLabelText('パスワード'), {
       target: { value: 'password' },
@@ -42,7 +42,7 @@ describe('MineTenant routes', () => {
       await screen.findByRole('heading', { name: INITIAL_PRODUCTS[0].name }),
     ).toBeInTheDocument();
     expect(login).toHaveBeenCalledWith({
-      email: 'demo@minetenant.jp',
+      username: 'demo_user',
       password: 'password',
     });
     expect(getProducts).toHaveBeenCalledOnce();
@@ -71,10 +71,10 @@ describe('MineTenant routes', () => {
 
   it('未ログインで保護画面を開くとログイン後に元の画面へ戻る', async () => {
     const { router } = renderApp('/sell');
-    await screen.findByLabelText('メールアドレス');
+    await screen.findByLabelText('ユーザー名');
     expect(router.state.location.pathname).toBe('/login');
-    fireEvent.change(screen.getByLabelText('メールアドレス'), {
-      target: { value: 'demo@minetenant.jp' },
+    fireEvent.change(screen.getByLabelText('ユーザー名'), {
+      target: { value: 'demo_user' },
     });
     fireEvent.change(screen.getByLabelText('パスワード'), {
       target: { value: 'password' },
@@ -89,13 +89,13 @@ describe('MineTenant routes', () => {
   it('認証情報が間違っている場合は画面遷移しない', async () => {
     vi.mocked(login).mockRejectedValueOnce(
       new ApiError(422, '入力内容を確認してください。', undefined, {
-        email: ['メールアドレスまたはパスワードが正しくありません。'],
+        username: ['ユーザー名またはパスワードが正しくありません。'],
       }),
     );
     const { router } = renderApp('/login');
-    await screen.findByLabelText('メールアドレス');
-    fireEvent.change(screen.getByLabelText('メールアドレス'), {
-      target: { value: 'demo@minetenant.jp' },
+    await screen.findByLabelText('ユーザー名');
+    fireEvent.change(screen.getByLabelText('ユーザー名'), {
+      target: { value: 'demo_user' },
     });
     fireEvent.change(screen.getByLabelText('パスワード'), {
       target: { value: 'wrong-password' },
@@ -104,9 +104,7 @@ describe('MineTenant routes', () => {
       screen.getByRole('button', { name: 'ログインして商品を見る' }),
     );
     expect(
-      await screen.findByText(
-        'メールアドレスまたはパスワードが正しくありません。',
-      ),
+      await screen.findByText('ユーザー名またはパスワードが正しくありません。'),
     ).toBeInTheDocument();
     expect(router.state.location.pathname).toBe('/login');
   });
@@ -128,7 +126,7 @@ describe('MineTenant routes', () => {
     vi.mocked(getCurrentUser).mockResolvedValue({ ...DEMO_USERS[0] });
     const { router } = renderApp('/sell');
     fireEvent.click(await screen.findByRole('button', { name: 'ログアウト' }));
-    await screen.findByLabelText('メールアドレス');
+    await screen.findByLabelText('ユーザー名');
     expect(logout).toHaveBeenCalledOnce();
     expect(router.state.location.pathname).toBe('/login');
     expect(screen.queryByLabelText('商品名')).not.toBeInTheDocument();
@@ -148,5 +146,52 @@ describe('MineTenant routes', () => {
       expect(screen.getByRole('button', { name: 'ログアウト' })).toBeEnabled(),
     );
     expect(router.state.location.pathname).toBe('/sell');
+  });
+
+  it('店舗を持たないユーザーは出品ページからマイページへ戻る', async () => {
+    vi.mocked(getCurrentUser).mockResolvedValue({
+      ...DEMO_USERS[0],
+      storeId: null,
+    });
+    const { router } = renderApp('/sell');
+    await waitFor(() => {
+      expect(router.state.location.pathname).toBe('/mypage');
+    });
+  });
+
+  it('店舗を持つユーザーは出品ページにアクセスできる', async () => {
+    vi.mocked(getCurrentUser).mockResolvedValue({
+      ...DEMO_USERS[0],
+      storeId: 'store-1',
+    });
+    const { router } = renderApp('/sell');
+    expect(await screen.findByLabelText('商品名')).toBeInTheDocument();
+    expect(router.state.location.pathname).toBe('/sell');
+  });
+
+  it('未ログインでも公開店舗ページを表示できる', async () => {
+    vi.mocked(getCurrentUser).mockResolvedValue(null);
+
+    vi.mocked(getStore).mockResolvedValue({
+      id: 'store-1',
+      ownerId: 'user-1',
+      name: 'テスト店舗',
+      description: '公開店舗のテスト',
+      level: 1,
+      points: 0,
+      syncStatus: 'offline',
+    });
+
+    vi.mocked(getProducts).mockResolvedValue([]);
+
+    const { router } = renderApp('/stores/store-1');
+
+    expect(
+      await screen.findByRole('heading', { name: 'テスト店舗' }),
+    ).toBeInTheDocument();
+
+    expect(router.state.location.pathname).toBe('/stores/store-1');
+    expect(getStore).toHaveBeenCalledWith('store-1');
+    expect(getProducts).toHaveBeenCalledWith('store-1');
   });
 });

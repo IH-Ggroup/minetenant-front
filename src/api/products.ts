@@ -74,7 +74,7 @@ export async function getStore(storeId: string): Promise<Store> {
   return apiRequest<Store>(`/stores/${encodeURIComponent(storeId)}`);
 }
 
-/* 店舗集計未使用 */
+/* 店舗集計 */
 export async function getStoreDashboard(
   storeId: string,
 ): Promise<StoreDashboard> {
@@ -82,6 +82,7 @@ export async function getStoreDashboard(
     `/stores/${encodeURIComponent(storeId)}/dashboard`,
   );
 }
+
 /* 商品詳細 */
 export async function getProduct(productId: string): Promise<Product> {
   const product = await apiRequest<Product>(

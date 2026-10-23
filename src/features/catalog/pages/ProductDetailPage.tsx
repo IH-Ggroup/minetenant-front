@@ -96,9 +96,11 @@ export function ProductDetailPage() {
           )}
 
           {isOwnProduct ? (
-            <ButtonLink to={paths.storeManage} variant="secondary" fullWidth>
-              自分の出品を管理する
-            </ButtonLink>
+            activeUser?.storeId != null ? (
+              <ButtonLink to={paths.storeManage} variant="secondary" fullWidth>
+                自分の出品を管理する
+              </ButtonLink>
+            ) : null
           ) : (
             <ButtonLink
               to={paths.checkout(product.id)}

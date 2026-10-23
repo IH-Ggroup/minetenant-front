@@ -5,16 +5,16 @@ import {
   advanceAuthGeneration,
   apiRequest,
   initializeCsrfCookie,
-} from './client';
+} from '@/api/client';
 
 export type LoginInput = {
-  email: string;
+  username: string;
   password: string;
 };
 
 export type RegisterInput = LoginInput & {
-  name: string;
-  password_confirmation: string;
+  displayName?: string | null;
+  passwordConfirmation: string;
 };
 
 export async function login(input: LoginInput): Promise<SessionUser> {

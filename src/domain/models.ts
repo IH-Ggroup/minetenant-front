@@ -10,11 +10,12 @@ export type ProductStatus = 'available' | 'sold';
 
 export interface SessionUser {
   id: string;
-  name: string;
+  username: string;
+  displayName: string;
   role: UserRole;
   roleLabel: string;
   avatarInitial: string;
-  storeId: string;
+  storeId: string | null;
 }
 
 export interface Product {
