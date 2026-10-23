@@ -117,25 +117,19 @@ export function ProductListPage() {
     <div className="page-stack">
       {pageHeader}
 
-      {isLoading ? (
-        <div role="status" aria-live="polite">
-          商品を読み込んでいます...
-        </div>
-      ) : (
-        <>
-          <section className="catalog-tools" aria-label="商品を検索">
-            <label className="search-field">
-              <Search size={19} aria-hidden="true" />
-              <span className="sr-only">商品を検索</span>
-              <input
-                type="search"
-                value={query}
-                onChange={(event) => setQuery(event.target.value)}
-                placeholder="商品名・説明から検索"
-              />
-            </label>
-            <span>{filteredProducts.length}件</span>
-          </section>
+      <section className="catalog-tools" aria-label="商品を検索">
+        <label className="search-field">
+          <Search size={19} aria-hidden="true" />
+          <span className="sr-only">商品を検索</span>
+          <input
+            type="search"
+            value={query}
+            onChange={(event) => setQuery(event.target.value)}
+            placeholder="商品名・説明から検索"
+          />
+        </label>
+        <span>{filteredProducts.length}件</span>
+      </section>
 
       {products.length === 0 ? (
         <EmptyState
