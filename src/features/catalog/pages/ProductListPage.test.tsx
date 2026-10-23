@@ -4,6 +4,7 @@ import { MemoryRouter } from 'react-router-dom';
 import { getProducts } from '@/api/products';
 import type { Product } from '@/domain/models';
 import { ProductListPage } from '@/features/catalog/pages/ProductListPage';
+import { DemoStoreProvider } from '@/app/DemoStoreProvider';
 
 vi.mock('@/api/products', () => ({
   getProducts: vi.fn(),
@@ -32,7 +33,9 @@ const productB = {
 function renderPage() {
   return render(
     <MemoryRouter>
-      <ProductListPage />
+      <DemoStoreProvider>
+        <ProductListPage />
+      </DemoStoreProvider>
     </MemoryRouter>,
   );
 }

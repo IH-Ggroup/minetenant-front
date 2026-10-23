@@ -7,8 +7,10 @@ import { ButtonLink } from '@/shared/ui/Button';
 import { EmptyState } from '@/shared/ui/EmptyState';
 import { PageHeader } from '@/shared/ui/PageHeader';
 import type { Product } from '@/domain/models';
+import { useDemoStore } from '@/app/demo-store-context';
 
 export function ProductListPage() {
+  const { activeUser } = useDemoStore();
   const [products, setProducts] = useState<Product[]>([]);
   const [query, setQuery] = useState('');
   const [isLoading, setIsLoading] = useState(true);
@@ -73,9 +75,11 @@ export function ProductListPage() {
       title="商品を探す"
       description="商品名から出品中の商品を検索できます。"
       actions={
-        <ButtonLink to={paths.sell} leadingIcon={<Plus size={18} />}>
-          商品を出品
-        </ButtonLink>
+        activeUser?.storeId != null ? (
+          <ButtonLink to={paths.sell} leadingIcon={<Plus size={18} />}>
+            商品を出品
+          </ButtonLink>
+        ) : undefined
       }
     />
   );
