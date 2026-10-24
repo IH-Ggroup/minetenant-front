@@ -81,7 +81,6 @@ export interface PurchaseResult {
   transactionId?: string;
 }
 
-// 追加
 export interface StoreDashboardStats {
   productCount: number;
   availableProductCount: number;
