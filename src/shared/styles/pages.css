@@ -132,7 +132,7 @@
   font-weight: bold;
 }
 
-.auth-logo{
+.auth-logo {
   font-size: 30px;
   color: black;
 }
@@ -166,7 +166,7 @@
   max-width: 100%;
 }
 
-.auth-button{
+.auth-button {
   text-align: center;
   margin: 30px 0;
 }
@@ -180,7 +180,9 @@
   color: #ffff;
   background-color: var(--color-mypage-button);
   text-decoration: none;
-  transition: background-color 0.2s, color 0.2s;
+  transition:
+    background-color 0.2s,
+    color 0.2s;
 }
 
 /* マウスを乗せたとき */
@@ -193,35 +195,36 @@
   width: 100%;
   box-sizing: border-box;
   padding: 12px 14px;
-  border: 1px solid #D5D0C8;
+  border: 1px solid #d5d0c8;
   border-radius: 8px;
-  background-color: #FFFFFF;
-  color: #39342D;
+  background-color: #ffffff;
+  color: #39342d;
   font-size: 16px;
-  transition: border-color 0.2s, box-shadow 0.2s;
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s;
 }
 
 /* 入力欄を選択しているとき */
 .auth-form .input:focus {
-  border-color: #8D7959;
+  border-color: #8d7959;
   outline: none;
   box-shadow: 0 0 0 3px rgb(141 121 89 / 18%);
 }
 
 /* 入力できる文字の説明 */
 .auth-form .input::placeholder {
-  color: #A49C91;
+  color: #a49c91;
   opacity: 1;
 }
 
 /* 入力エラー時 */
 .auth-form .input[aria-invalid='true'] {
-  border-color: #C44B45;
+  border-color: #c44b45;
 }
 .field__error {
-  color: #C44B45;
+  color: #c44b45;
 }
-
 
 @media (max-width: 600px) {
   .review-list > div,

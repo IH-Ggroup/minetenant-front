@@ -312,7 +312,6 @@ function AuthForm({ isSignup }: { isSignup: boolean }) {
             {isSignup ? '登録する' : 'ログインして商品を見る'}
           </Button>
         </div>
-
       </form>
 
       <div className="auth-card__switch">
