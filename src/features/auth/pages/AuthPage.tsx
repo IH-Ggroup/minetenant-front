@@ -307,9 +307,12 @@ function AuthForm({ isSignup }: { isSignup: boolean }) {
           />
         ) : null}
 
-        <Button type="submit" fullWidth isLoading={isSubmitting}>
-          {isSignup ? '登録する' : 'ログインして商品を見る'}
-        </Button>
+        <div className="auth-button">
+          <Button type="submit" fullWidth isLoading={isSubmitting}>
+            {isSignup ? '登録する' : 'ログインして商品を見る'}
+          </Button>
+        </div>
+
       </form>
 
       <div className="auth-card__switch">
