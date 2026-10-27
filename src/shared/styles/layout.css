@@ -7,25 +7,33 @@
 .app-header__inner {
   display: flex;
   flex-wrap: wrap;
-  align-items: baseline;
+  align-items: center;
   gap: 12px 32px;
 }
 
 .main-nav {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px 16px;
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: var(--color-nav);
+  gap: 7px;
+  padding: 7px;
   margin-block: 8px;
+  font-size: var(--size-detail);
 }
 
+.main-nav__link {
+  background-color: #b6a789;
+  width: 70px;
+  height: 70px;
+  text-align: center;
+}
 .main-nav__link.is-active {
+  border: 2px solid #ffff;
   font-weight: bold;
-}
-
-.prototype-note,
-.auth-layout__description {
-  color: var(--color-muted);
-  font-size: 0.875rem;
 }
 
 .app-main,
@@ -42,4 +50,24 @@
 .app-main:focus,
 .auth-layout:focus {
   outline: none;
+}
+
+.app-logo {
+  color: black;
+  font-size: 30px;
+}
+
+.header-user,
+.login-button {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-left: auto;
+}
+.login-button {
+  background-color: var(--color-mypage-button);
+}
+
+.username {
+  font-size: var(--size-subtitle);
 }
