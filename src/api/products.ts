@@ -97,7 +97,6 @@ export async function getTransactions(): Promise<Transaction[]> {
   return apiRequest<Transaction[]>('/transactions');
 }
 
-// 追加
 function validateProduct(product: Product): Product {
   if (product.status !== 'available' && product.status !== 'sold') {
     throw new Error(`Invalid product status: ${product.status}`);
