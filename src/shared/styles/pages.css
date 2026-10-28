@@ -132,6 +132,100 @@
   font-weight: bold;
 }
 
+.auth-logo {
+  font-size: 30px;
+  color: black;
+}
+
+/* ログイン・新規登録画面 */
+.auth-layout {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+}
+
+.auth-layout__header {
+  text-align: center;
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 440px;
+  box-sizing: border-box;
+}
+
+.auth-card__heading {
+  text-align: center;
+}
+
+.auth-form {
+  width: 100%;
+  max-width: 100%;
+}
+
+.auth-button {
+  text-align: center;
+  margin: 30px 0;
+}
+
+/* ログイン・新規登録の切り替えリンク */
+.auth-card__switch a {
+  display: inline-block;
+  padding: 6px 12px;
+  margin-top: 8px;
+  border-radius: 8px;
+  color: #ffff;
+  background-color: var(--color-mypage-button);
+  text-decoration: none;
+  transition:
+    background-color 0.2s,
+    color 0.2s;
+}
+
+/* マウスを乗せたとき */
+.auth-card__switch a:hover {
+  filter: brightness(0.9);
+}
+
+/* ログイン・新規登録の入力欄 */
+.auth-form .input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 12px 14px;
+  border: 1px solid #d5d0c8;
+  border-radius: 8px;
+  background-color: #ffffff;
+  color: #39342d;
+  font-size: 16px;
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s;
+}
+
+/* 入力欄を選択しているとき */
+.auth-form .input:focus {
+  border-color: #8d7959;
+  outline: none;
+  box-shadow: 0 0 0 3px rgb(141 121 89 / 18%);
+}
+
+/* 入力できる文字の説明 */
+.auth-form .input::placeholder {
+  color: #a49c91;
+  opacity: 1;
+}
+
+/* 入力エラー時 */
+.auth-form .input[aria-invalid='true'] {
+  border-color: #c44b45;
+}
+.field__error {
+  color: #c44b45;
+}
+
 @media (max-width: 600px) {
   .review-list > div,
   .order-summary dl > div {

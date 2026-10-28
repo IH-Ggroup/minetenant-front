@@ -4,7 +4,7 @@ export function AuthLayout() {
   return (
     <main id="main-content" className="auth-layout" tabIndex={-1}>
       <header className="auth-layout__header">
-        <strong>MineTenant</strong>
+        <strong className="auth-logo">MineTenant</strong>
       </header>
       <Outlet />
     </main>
