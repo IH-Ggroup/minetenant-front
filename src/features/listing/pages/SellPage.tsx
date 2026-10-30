@@ -14,7 +14,6 @@ interface ListingFormState {
   name: string;
   description: string;
   price: string;
-  stock: string;
   category: ProductCategory;
 }
 
@@ -26,7 +25,6 @@ export function SellPage() {
     name: '',
     description: '',
     price: '',
-    stock: '1',
     category: 'fashion',
   });
 
@@ -47,13 +45,21 @@ export function SellPage() {
       return;
     }
 
+    const name = form.name.trim();
+    const description = form.description.trim();
+    const price = Number(form.price);
+
+    if (!name || !description || !Number.isSafeInteger(price) || price < 1) {
+      return;
+    }
+
     saveListingDraft({
       sellerId: activeUser.id,
       storeId: activeUser.storeId,
-      name: form.name.trim(),
-      description: form.description.trim(),
-      price: Number(form.price),
-      stock: Number(form.stock),
+      name,
+      description,
+      price,
+      stock: 1,
       category: form.category,
       theme: 'forest',
       emoji: '📦',
@@ -103,39 +109,22 @@ export function SellPage() {
             />
           </label>
 
-          <div className="form-grid form-grid--two">
-            <label className="field">
-              <span className="field__label">価格</span>
-              <div className="input-affix">
-                <span>¥</span>
-                <input
-                  className="input"
-                  type="number"
-                  min="1"
-                  value={form.price}
-                  onChange={(event) => updateField('price', event.target.value)}
-                  placeholder="3000"
-                  required
-                />
-              </div>
-            </label>
-
-            <label className="field">
-              <span className="field__label">在庫数</span>
-              <div className="input-affix input-affix--suffix">
-                <input
-                  className="input"
-                  type="number"
-                  min="0"
-                  value={form.stock}
-                  onChange={(event) => updateField('stock', event.target.value)}
-                  required
-                />
-                <span>点</span>
-              </div>
-            </label>
-          </div>
-
+          <label className="field">
+            <span className="field__label">価格</span>
+            <div className="input-affix">
+              <span>¥</span>
+              <input
+                className="input"
+                type="number"
+                min="1"
+                step="1"
+                value={form.price}
+                onChange={(event) => updateField('price', event.target.value)}
+                placeholder="3000"
+                required
+              />
+            </div>
+          </label>
           <label className="field">
             <span className="field__label">カテゴリ</span>
             <select
