@@ -54,12 +54,9 @@ export function SellPage() {
     }
 
     saveListingDraft({
-      sellerId: activeUser.id,
-      storeId: activeUser.storeId,
       name,
       description,
       price,
-      stock: 1,
       category: form.category,
       theme: 'forest',
       emoji: '📦',

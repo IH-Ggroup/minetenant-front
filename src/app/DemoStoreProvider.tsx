@@ -16,7 +16,11 @@ import {
 } from '@/api/auth';
 import { onUnauthorized } from '@/api/client';
 import { DemoStoreContext } from '@/app/demo-store-context';
-import type { SessionUser, CreateProductInput } from '@/domain/models';
+import type {
+  SessionUser,
+  CreateProductInput,
+  ListingDraft,
+} from '@/domain/models';
 
 // 各画面で共有している名前は維持し、認証情報はHono APIで管理します。
 export function DemoStoreProvider({ children }: PropsWithChildren) {
@@ -120,9 +124,16 @@ export function DemoStoreProvider({ children }: PropsWithChildren) {
     }
   }, [clearSession]);
 
-  const saveListingDraft = useCallback((draft: CreateProductInput) => {
-    setListingDraft(draft);
-  }, []);
+  const saveListingDraft = (draft: ListingDraft) => {
+    if (!activeUser) return;
+
+    setListingDraft({
+      ...draft,
+      sellerId: activeUser.id,
+      storeId: activeUser.storeId,
+      stock: 1,
+    });
+  };
 
   return (
     <DemoStoreContext.Provider

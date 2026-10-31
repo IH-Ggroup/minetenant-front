@@ -38,9 +38,7 @@ describe('Honoセッションの状態管理', () => {
     await waitFor(() =>
       expect(result.current.authStatus).toBe('authenticated'),
     );
-    act(() =>
-      result.current.saveListingDraft({ ...INITIAL_PRODUCTS[0], stock: 1 }),
-    );
+    act(() => result.current.saveListingDraft({ ...INITIAL_PRODUCTS[0] }));
     expect(result.current.listingDraft).not.toBeNull();
     act(() => notifications.unauthorized());
     expect(result.current.activeUser).toBeNull();
@@ -53,9 +51,7 @@ describe('Honoセッションの状態管理', () => {
     await waitFor(() =>
       expect(result.current.authStatus).toBe('authenticated'),
     );
-    act(() =>
-      result.current.saveListingDraft({ ...INITIAL_PRODUCTS[0], stock: 1 }),
-    );
+    act(() => result.current.saveListingDraft({ ...INITIAL_PRODUCTS[0] }));
     await act(() => result.current.logout());
     expect(result.current.activeUser).toBeNull();
     expect(result.current.listingDraft).toBeNull();

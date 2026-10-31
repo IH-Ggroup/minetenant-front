@@ -54,6 +54,15 @@ export interface Transaction {
   createdAt: string;
 }
 
+export interface ListingDraft {
+  name: string;
+  description: string;
+  price: number;
+  category: ProductCategory;
+  theme: ProductTheme;
+  emoji: string;
+}
+
 export interface CreateProductInput {
   sellerId: string; //api一致用追加
   storeId: string; //api一致用追加

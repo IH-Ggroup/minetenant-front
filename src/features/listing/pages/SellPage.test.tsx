@@ -59,12 +59,9 @@ describe('SellPage', () => {
     fireEvent.click(screen.getByRole('button', { name: /内容を確認する/ }));
     expect(demoStore.saveListingDraft).toHaveBeenCalledOnce();
     expect(demoStore.saveListingDraft).toHaveBeenCalledWith({
-      sellerId: 'user-1',
-      storeId: 'store-1',
       name: '鉱石モチーフのペンダント',
       description: '青い鉱石をイメージした手作りペンダントです。',
       price: 3200,
-      stock: 1,
       category: 'accessory',
       theme: 'forest',
       emoji: '📦',
