@@ -71,3 +71,42 @@ describe('SellPage', () => {
     ).toBeInTheDocument();
   });
 });
+it.each([
+  ['', '有効な説明', '3200'],
+  ['商品名', '', '3200'],
+  ['商品名', '有効な説明', '0'],
+  ['商品名', '有効な説明', '-1'],
+  ['商品名', '有効な説明', '1.5'],
+  ['商品名', '有効な説明', '9007199254740992'],
+])(
+  '必須不足・不正価格では下書きを保存せず遷移しない',
+  (name, description, price) => {
+    renderSellPage();
+
+    fireEvent.change(screen.getByLabelText('商品名'), {
+      target: { value: name },
+    });
+    fireEvent.change(screen.getByLabelText('商品説明'), {
+      target: { value: description },
+    });
+    fireEvent.change(screen.getByLabelText(/^価格/), {
+      target: { value: price },
+    });
+
+    // handleSubmit側の検証を確認する
+    fireEvent.submit(
+      screen
+        .getByRole('button', {
+          name: /内容を確認する/,
+        })
+        .closest('form')!,
+    );
+
+    expect(demoStore.saveListingDraft).not.toHaveBeenCalled();
+    expect(
+      screen.queryByRole('heading', {
+        name: '/sell/review',
+      }),
+    ).not.toBeInTheDocument();
+  },
+);
