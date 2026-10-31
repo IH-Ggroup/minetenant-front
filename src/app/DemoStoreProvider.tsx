@@ -115,7 +115,7 @@ export function DemoStoreProvider({ children }: PropsWithChildren) {
       throw new Error('認証処理中です。完了までお待ちください。');
     authMutation.current = true;
     sessionRequest.current += 1;
-    // 通信失敗時にログアウト済みと見せないよう、サーバーの成功を待ちます。
+
     try {
       await logoutApi();
       clearSession();
@@ -125,7 +125,9 @@ export function DemoStoreProvider({ children }: PropsWithChildren) {
   }, [clearSession]);
 
   const saveListingDraft = (draft: ListingDraft) => {
-    if (!activeUser) return;
+    if (!activeUser || !activeUser.storeId) {
+      return;
+    }
 
     setListingDraft({
       ...draft,
