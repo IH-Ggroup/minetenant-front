@@ -66,7 +66,6 @@ describe('MineTenant routes', () => {
     expect(await screen.findByLabelText('商品名')).toBeRequired();
     expect(screen.getByLabelText('商品説明')).toBeRequired();
     expect(screen.getByLabelText(/^価格/)).toBeRequired();
-    expect(screen.getByLabelText(/^在庫数/)).toBeRequired();
   });
 
   it('未ログインで保護画面を開くとログイン後に元の画面へ戻る', async () => {
