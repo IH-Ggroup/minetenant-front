@@ -49,7 +49,13 @@ export function SellPage() {
     const description = form.description.trim();
     const price = Number(form.price);
 
-    if (!name || !description || !Number.isSafeInteger(price) || price < 1) {
+    if (
+      !name ||
+      !description ||
+      !Number.isSafeInteger(price) ||
+      price < 1 ||
+      price > 99999999
+    ) {
       return;
     }
 
@@ -114,6 +120,7 @@ export function SellPage() {
                 className="input"
                 type="number"
                 min="1"
+                max="99999999"
                 step="1"
                 value={form.price}
                 onChange={(event) => updateField('price', event.target.value)}
