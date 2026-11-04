@@ -120,6 +120,8 @@ export function SellPage() {
                 className="input"
                 type="number"
                 min="1"
+                max="99999999"
+                step="1"
                 value={form.price}
                 onChange={(event) => updateField('price', event.target.value)}
                 placeholder="3000"
