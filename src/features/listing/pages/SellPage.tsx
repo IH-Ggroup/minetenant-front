@@ -19,14 +19,14 @@ interface ListingFormState {
 
 export function SellPage() {
   const navigate = useNavigate();
-  const { activeUser, saveListingDraft } = useDemoStore();
+  const { activeUser, listingDraft, saveListingDraft } = useDemoStore();
 
-  const [form, setForm] = useState<ListingFormState>({
-    name: '',
-    description: '',
-    price: '',
-    category: 'fashion',
-  });
+  const [form, setForm] = useState<ListingFormState>(() => ({
+    name: listingDraft?.name ?? '',
+    description: listingDraft?.description ?? '',
+    price: listingDraft?.price?.toString() ?? '',
+    category: listingDraft?.category ?? 'fashion',
+  }));
 
   const updateField = <Key extends keyof ListingFormState>(
     key: Key,
