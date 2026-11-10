@@ -1,11 +1,7 @@
 import { createContext, useContext } from 'react';
 
 import type { LoginInput, RegisterInput } from '@/api/auth';
-import type {
-  SessionUser,
-  // CreateProductInput,
-  ListingDraft,
-} from '@/domain/models';
+import type { SessionUser, ListingDraft } from '@/domain/models';
 
 export const DemoStoreContext = createContext<{
   activeUser: SessionUser | null;

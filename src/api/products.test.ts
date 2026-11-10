@@ -86,7 +86,6 @@ describe('Products API with authenticated ownership', () => {
 
     await expect(products.getProduct(product.id)).resolves.toEqual(product);
   });
-  //
   it('does not accept an unknown product status', async () => {
     const product = {
       ...INITIAL_PRODUCTS[0],
@@ -100,7 +99,7 @@ describe('Products API with authenticated ownership', () => {
     );
 
     await expect(products.getProduct(product.id)).rejects.toThrow();
-  }); //
+  });
   it('does not accept an unknown product status in the product list', async () => {
     const productList = [
       INITIAL_PRODUCTS[0],

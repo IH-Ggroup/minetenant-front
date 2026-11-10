@@ -17,6 +17,19 @@ function fingerprint(draft: ListingDraft): string {
     draft.emoji,
   ]);
 }
+export function createListingRequestId(currentFingerprint: string) {
+  const requestId = crypto.randomUUID();
+
+  sessionStorage.setItem(
+    STORAGE_KEY,
+    JSON.stringify({
+      fingerprint: currentFingerprint,
+      requestId,
+    }),
+  );
+
+  return requestId;
+}
 
 export function getListingRequestId(draft: ListingDraft): string {
   const currentFingerprint = fingerprint(draft);
@@ -34,20 +47,12 @@ export function getListingRequestId(draft: ListingDraft): string {
         return pending.requestId;
       }
     } catch {
-      // 保存データが不正なら新しいIDを発行する
+      const requestId = createListingRequestId(currentFingerprint);
+      return requestId;
     }
   }
 
-  const requestId = crypto.randomUUID();
-
-  sessionStorage.setItem(
-    STORAGE_KEY,
-    JSON.stringify({
-      fingerprint: currentFingerprint,
-      requestId,
-    }),
-  );
-
+  const requestId = createListingRequestId(currentFingerprint);
   return requestId;
 }
 

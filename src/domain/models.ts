@@ -65,7 +65,7 @@ export interface ListingDraft {
 }
 
 export interface CreateProductInput {
-  requestId: string; //
+  requestId: string;
   name: string;
   description: string;
   price: number;
