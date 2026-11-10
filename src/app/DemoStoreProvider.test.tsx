@@ -57,6 +57,17 @@ describe('Honoセッションの状態管理', () => {
     expect(result.current.listingDraft).toBeNull();
   });
 
+  it('ログアウト時は別ユーザーに下書きを引き継がない', async () => {
+    const { result } = renderHook(useDemoStore, { wrapper: DemoStoreProvider });
+    await waitFor(() =>
+      expect(result.current.authStatus).toBe('authenticated'),
+    );
+    act(() => result.current.saveListingDraft({ ...INITIAL_PRODUCTS[0] }));
+    await act(() => result.current.logout());
+    expect(result.current.activeUser).toBeNull();
+    expect(result.current.listingDraft).toBeNull();
+  });
+
   it('遅い復元応答で新しいログイン結果を上書きしない', async () => {
     let resolveSession!: (user: SessionUser | null) => void;
     vi.mocked(getCurrentUser).mockReturnValueOnce(

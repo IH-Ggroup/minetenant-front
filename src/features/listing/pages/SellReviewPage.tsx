@@ -98,11 +98,6 @@ export function SellReviewPage() {
           </div>
 
           <div>
-            <dt>在庫数</dt>
-            <dd>{draft.stock}点</dd>
-          </div>
-
-          <div>
             <dt>カテゴリ</dt>
             <dd>{categoryLabels[draft.category]}</dd>
           </div>
