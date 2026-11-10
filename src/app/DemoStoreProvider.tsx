@@ -16,12 +16,7 @@ import {
 } from '@/api/auth';
 import { onUnauthorized } from '@/api/client';
 import { DemoStoreContext } from '@/app/demo-store-context';
-import type {
-  SessionUser,
-  CreateProductInput,
-  ListingDraft,
-} from '@/domain/models';
-
+import type { SessionUser, ListingDraft } from '@/domain/models';
 // 各画面で共有している名前は維持し、認証情報はHono APIで管理します。
 export function DemoStoreProvider({ children }: PropsWithChildren) {
   const [activeUser, setActiveUser] = useState<SessionUser | null>(null);
@@ -29,9 +24,7 @@ export function DemoStoreProvider({ children }: PropsWithChildren) {
     'loading' | 'authenticated' | 'unauthenticated' | 'error'
   >('loading');
   const [authError, setAuthError] = useState<string | null>(null);
-  const [listingDraft, setListingDraft] = useState<CreateProductInput | null>(
-    null,
-  );
+  const [listingDraft, setListingDraft] = useState<ListingDraft | null>(null);
   // 遅れて返った復元リクエストがログイン・ログアウト結果を上書きするのを防ぎます。
   const sessionRequest = useRef(0);
   // 別画面や複数のボタンから認証操作を同時送信しないようにします。
@@ -125,16 +118,9 @@ export function DemoStoreProvider({ children }: PropsWithChildren) {
   }, [clearSession]);
 
   const saveListingDraft = (draft: ListingDraft) => {
-    if (!activeUser || !activeUser.storeId) {
-      return;
-    }
+    if (!activeUser || !activeUser.storeId) return;
 
-    setListingDraft({
-      ...draft,
-      sellerId: activeUser.id,
-      storeId: activeUser.storeId,
-      stock: 1,
-    });
+    setListingDraft({ ...draft });
   };
 
   return (

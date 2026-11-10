@@ -4,6 +4,12 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { createProduct, getStore } from '@/api/products';
 import { useDemoStore } from '@/app/demo-store-context';
 import { SellReviewPage } from './SellReviewPage';
+import type { ListingDraft } from '@/domain/models';
+import {
+  getListingRequestId,
+  clearListingRequest,
+} from '@/features/listing/listing-request';
+
 const { navigateMock } = vi.hoisted(() => ({
   navigateMock: vi.fn(),
 }));
@@ -25,12 +31,13 @@ vi.mock('@/shared/ui/Button', async (importOriginal) => {
   const actual = await importOriginal<typeof import('@/shared/ui/Button')>();
   return actual;
 });
-const draft = {
+const draft: ListingDraft = {
   name: 'テスト商品',
   description: 'テスト用の商品説明',
   price: 100,
-  stock: 1,
-  category: 'building',
+  category: 'interior',
+  theme: 'forest',
+  emoji: '🌳',
 };
 const activeUser = {
   id: 'user-1',
@@ -51,6 +58,7 @@ function setup(storeId: string | null) {
 }
 beforeEach(() => {
   vi.clearAllMocks();
+  sessionStorage.clear();
   vi.mocked(getStore).mockResolvedValue({
     id: 'store-1',
     name: 'テスト店舗',
@@ -84,7 +92,75 @@ describe('SellReviewPage', () => {
     setup('store-1');
     fireEvent.click(screen.getByRole('button', { name: /出品する/ }));
     await waitFor(() => {
-      expect(createProduct).toHaveBeenCalledWith(draft);
+      expect(createProduct).toHaveBeenCalledWith(
+        expect.objectContaining({
+          ...draft,
+          requestId: expect.any(String),
+        }),
+      );
     });
+  });
+  it('出品ボタンを連打してもPOSTは1回だけ', async () => {
+    setup('store-1');
+
+    vi.mocked(createProduct).mockImplementation(
+      () =>
+        new Promise((resolve) => {
+          setTimeout(
+            () =>
+              resolve({
+                id: 'product-1',
+              } as Awaited<ReturnType<typeof createProduct>>),
+            50,
+          );
+        }),
+    );
+    const button = screen.getByRole('button', {
+      name: /出品する/,
+    });
+    fireEvent.click(button);
+    fireEvent.click(button);
+    fireEvent.click(button);
+    await waitFor(() => {
+      expect(createProduct).toHaveBeenCalledOnce();
+    });
+  });
+  it('network error後の再試行では同じrequestIdを使用する', async () => {
+    setup('store-1');
+    vi.mocked(createProduct)
+      .mockRejectedValueOnce(new Error('Network Error'))
+      .mockResolvedValueOnce({
+        id: 'product-1',
+      } as Awaited<ReturnType<typeof createProduct>>);
+    const button = screen.getByRole('button', {
+      name: /出品する/,
+    });
+    fireEvent.click(button);
+    await screen.findByRole('alert');
+    fireEvent.click(button);
+    await waitFor(() => {
+      expect(createProduct).toHaveBeenCalledTimes(2);
+    });
+    const firstRequest = vi.mocked(createProduct).mock.calls[0][0];
+    const secondRequest = vi.mocked(createProduct).mock.calls[1][0];
+    expect(secondRequest.requestId).toBe(firstRequest.requestId);
+    expect(navigateMock).toHaveBeenCalledWith('/sell/sync/product-1');
+  });
+  it('出品内容を変更した場合は新しいrequestIdを使用する', async () => {
+    setup('store-1');
+    vi.mocked(createProduct).mockRejectedValueOnce(new Error('Network Error'));
+    const button = screen.getByRole('button', {
+      name: /出品する/,
+    });
+    fireEvent.click(button);
+    await screen.findByRole('alert');
+    const firstRequestId = vi.mocked(createProduct).mock.calls[0][0].requestId;
+    const changedDraft = {
+      ...draft,
+      name: '変更後の商品',
+    };
+    const secondRequestId = getListingRequestId(changedDraft);
+    expect(secondRequestId).not.toBe(firstRequestId);
+    clearListingRequest(secondRequestId);
   });
 });
