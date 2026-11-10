@@ -4,6 +4,8 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { createProduct, getStore } from '@/api/products';
 import { useDemoStore } from '@/app/demo-store-context';
 import { SellReviewPage } from './SellReviewPage';
+import type { ListingDraft } from '@/domain/models';
+
 const { navigateMock } = vi.hoisted(() => ({
   navigateMock: vi.fn(),
 }));
@@ -25,12 +27,13 @@ vi.mock('@/shared/ui/Button', async (importOriginal) => {
   const actual = await importOriginal<typeof import('@/shared/ui/Button')>();
   return actual;
 });
-const draft = {
+const draft: ListingDraft = {
   name: 'テスト商品',
   description: 'テスト用の商品説明',
   price: 100,
-  stock: 1,
-  category: 'building',
+  category: 'interior',
+  theme: 'forest',
+  emoji: '🌳',
 };
 const activeUser = {
   id: 'user-1',
@@ -84,7 +87,12 @@ describe('SellReviewPage', () => {
     setup('store-1');
     fireEvent.click(screen.getByRole('button', { name: /出品する/ }));
     await waitFor(() => {
-      expect(createProduct).toHaveBeenCalledWith(draft);
+      expect(createProduct).toHaveBeenCalledWith(
+        expect.objectContaining({
+          ...draft,
+          requestId: expect.any(String),
+        }),
+      );
     });
   });
 });

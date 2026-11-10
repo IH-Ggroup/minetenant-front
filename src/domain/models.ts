@@ -65,12 +65,10 @@ export interface ListingDraft {
 }
 
 export interface CreateProductInput {
-  sellerId: string; //api一致用追加
-  storeId: string; //api一致用追加
+  requestId: string; //
   name: string;
   description: string;
   price: number;
-  stock: number;
   category: ProductCategory;
   theme: ProductTheme;
   emoji: string;

@@ -119,30 +119,44 @@ describe('Products API with authenticated ownership', () => {
     await expect(products.getProducts()).rejects.toThrow();
   });
 
-  it('sends only listing fields, stripping client-provided owner IDs from an input object', async () => {
+  it('sends only listing fields and requestId, excluding client-provided owner IDs', async () => {
     const product = INITIAL_PRODUCTS[0];
+
     const input = {
-      ...product,
+      requestId: 'stable-request-id',
+      name: product.name,
+      description: product.description,
+      price: product.price,
+      category: product.category,
+      theme: product.theme,
+      emoji: product.emoji,
       sellerId: 'spoofed-seller',
       storeId: 'spoofed-store',
-      stock: 1,
     };
+
     fetchMock.mockResolvedValue(jsonResponse({ data: product }, 201));
 
     await expect(products.createProduct(input)).resolves.toEqual(product);
 
     expect(fetchMock.mock.calls[0][0]).toBe(`${BASE_URL}/products`);
+
     const request = fetchMock.mock.calls[0][1]!;
+
     expect(JSON.parse(request.body as string)).toEqual({
+      requestId: 'stable-request-id',
       name: product.name,
       description: product.description,
       price: product.price,
-      stock: 1,
       category: product.category,
       theme: product.theme,
       emoji: product.emoji,
     });
-    expect(request).toMatchObject({ method: 'POST', credentials: 'include' });
+
+    expect(request).toMatchObject({
+      method: 'POST',
+      credentials: 'include',
+    });
+
     expect(new Headers(request.headers).get('X-XSRF-TOKEN')).toBe(
       'valid+token',
     );

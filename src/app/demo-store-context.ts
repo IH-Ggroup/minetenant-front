@@ -3,7 +3,7 @@ import { createContext, useContext } from 'react';
 import type { LoginInput, RegisterInput } from '@/api/auth';
 import type {
   SessionUser,
-  CreateProductInput,
+  // CreateProductInput,
   ListingDraft,
 } from '@/domain/models';
 
@@ -16,7 +16,7 @@ export const DemoStoreContext = createContext<{
   register: (input: RegisterInput) => Promise<void>;
   logout: () => Promise<void>;
   saveListingDraft(draft: ListingDraft): void;
-  listingDraft: CreateProductInput | null;
+  listingDraft: ListingDraft | null;
 } | null>(null);
 
 export function useDemoStore() {
