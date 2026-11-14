@@ -1,7 +1,6 @@
 import { ArrowLeft, ArrowRight, PackageCheck } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-
 import { createProduct, getStore } from '@/api/products';
 import { useDemoStore } from '@/app/demo-store-context';
 import { paths } from '@/app/paths';
@@ -10,6 +9,11 @@ import { categoryLabels, formatPrice } from '@/shared/lib/format';
 import { Button, ButtonLink } from '@/shared/ui/Button';
 import { EmptyState } from '@/shared/ui/EmptyState';
 import { StepIndicator } from '@/shared/ui/StepIndicator';
+import { ApiError } from '@/api/client';
+import {
+  getListingRequestId,
+  clearListingRequest,
+} from '@/features/listing/listing-request';
 
 export function SellReviewPage() {
   const navigate = useNavigate();
@@ -46,7 +50,6 @@ export function SellReviewPage() {
 
   const handlePublish = async () => {
     if (isPublishing) return;
-
     if (!activeUser || activeUser.storeId === null) {
       setError('出品には店舗の登録が必要です。');
       return;
@@ -54,14 +57,38 @@ export function SellReviewPage() {
     setIsPublishing(true);
     setError('');
     try {
-      const product = await createProduct(draft);
+      const requestId = getListingRequestId(draft);
+      const product = await createProduct({
+        ...draft,
+        requestId,
+      });
+
+      clearListingRequest(requestId);
       navigate(paths.sellSync(product.id));
     } catch (error) {
-      setError(
-        error instanceof Error
-          ? error.message
-          : '出品情報を保存できませんでした。',
-      );
+      if (error instanceof ApiError) {
+        if (error.status === 409) {
+          setError('出品内容が競合しています。内容を確認してください。');
+        } else if (error.status === 422) {
+          setError(
+            Object.values(error.errors).flat().join('\n') || error.message,
+          );
+        } else if (error.status === 429) {
+          setError(
+            error.retryAfter
+              ? `リクエストが集中しています。${error.retryAfter}秒後を目安に再試行してください。`
+              : error.message,
+          );
+        } else {
+          setError(error.message);
+        }
+      } else {
+        setError(
+          error instanceof Error
+            ? error.message
+            : '出品情報を保存できませんでした。',
+        );
+      }
     } finally {
       setIsPublishing(false);
     }
