@@ -2,8 +2,11 @@ import { PackageSearch, Plus, Search } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { getProducts } from '@/api/products';
 import { useDemoStore } from '@/app/demo-store-context';
+import { paths } from '@/app/paths';
 import { ProductCard } from '@/features/catalog/components/ProductCard';
+import { ButtonLink } from '@/shared/ui/Button';
 import { EmptyState } from '@/shared/ui/EmptyState';
+import { PageHeader } from '@/shared/ui/PageHeader';
 import type { Product } from '@/domain/models';
 
 export function ProductListPage() {
@@ -67,10 +70,24 @@ export function ProductListPage() {
     );
   }, [query, products]);
 
+  const pageHeader = (
+    <PageHeader
+      title="商品を探す"
+      description="商品名から出品中の商品を検索できます。"
+      actions={
+        activeUser?.storeId != null ? (
+          <ButtonLink to={paths.sell} leadingIcon={<Plus size={18} />}>
+            商品を出品
+          </ButtonLink>
+        ) : undefined
+      }
+    />
+  );
 
   if (isLoading) {
     return (
       <div className="page-stack">
+        {pageHeader}
         <div role="status" aria-live="polite">
           商品を読み込んでいます...
         </div>
@@ -81,6 +98,7 @@ export function ProductListPage() {
   if (error) {
     return (
       <div className="page-stack">
+        {pageHeader}
         <div role="alert">
           <p>{error}</p>
           <button
@@ -97,7 +115,7 @@ export function ProductListPage() {
 
   return (
     <div className="page-stack">
-
+      {pageHeader}
       <section className="catalog-tools" aria-label="商品を検索">
         <label className="search-field">
           <Search size={19} aria-hidden="true" />

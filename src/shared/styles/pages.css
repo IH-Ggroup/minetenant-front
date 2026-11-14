@@ -8,10 +8,9 @@
 .auth-card__heading {
   margin-bottom: 24px;
 }
-.PageHeader{
+.PageHeader {
   font-size: 25px;
 }
-
 
 .catalog-tools {
   display: flex;
@@ -61,7 +60,6 @@
 .search-field:focus-within {
   border-color: #806b55;
 }
-
 
 .product-grid {
   display: grid;
@@ -126,7 +124,7 @@
   }
 }
 
-.product-card h2 a{
+.product-card h2 a {
   color: var(--color-text);
 }
 
