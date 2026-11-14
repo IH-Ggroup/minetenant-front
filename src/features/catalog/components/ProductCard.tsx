@@ -25,6 +25,9 @@ export function ProductCard({ product, store }: ProductCardProps) {
           emoji={product.emoji}
           name={product.name}
         />
+        {isSoldOut && (
+          <span className="product-card__sold-badge">売り切れ</span>
+        )}
       </Link>
       <div className="product-card__body">
         <h2>
@@ -33,7 +36,9 @@ export function ProductCard({ product, store }: ProductCardProps) {
         <p className="product-card__store">{store?.name ?? '店舗情報なし'}</p>
         <div className="product-card__footer">
           <strong>{formatPrice(product.price)}</strong>
-          <span>{isSoldOut ? '売り切れ' : `販売中`}</span>
+          <span className={`product-card__status ${isSoldOut ? 'product-card__status--sold' : 'product-card__status--available'}`}>
+            {isSoldOut ? '売り切れ' : '販売中'}
+          </span>        
         </div>
       </div>
     </article>
