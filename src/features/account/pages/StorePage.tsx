@@ -1,49 +1,179 @@
 import { ArrowLeft, PackageSearch, Store as StoreIcon } from 'lucide-react';
 import { Link, useParams } from 'react-router-dom';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
+import { ApiError } from '@/api/client';
 import { getProducts, getStore } from '@/api/products';
 import { paths } from '@/app/paths';
 import type { Product, Store } from '@/domain/models';
 import { ProductCard } from '@/features/catalog/components/ProductCard';
 import { Badge } from '@/shared/ui/Badge';
-import { ButtonLink } from '@/shared/ui/Button';
+import { Button, ButtonLink } from '@/shared/ui/Button';
 import { EmptyState } from '@/shared/ui/EmptyState';
 import { PageHeader } from '@/shared/ui/PageHeader';
+
+type StoreError = 'not-found' | 'request-failed';
 
 export function StorePage() {
   const { storeId = '' } = useParams();
 
   const [store, setStore] = useState<Store | null>(null);
   const [products, setProducts] = useState<Product[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [storeError, setStoreError] = useState<StoreError | null>(null);
+  const [isProductsLoading, setIsProductsLoading] = useState(false);
+  const [productsError, setProductsError] = useState(false);
 
-  useEffect(() => {
+  const loadStore = useCallback(async () => {
     if (!storeId) {
+      setStore(null);
+      setStoreError('not-found');
+      setIsLoading(false);
       return;
     }
 
-    getStore(storeId)
-      .then(setStore)
-      .catch((error) => {
-        console.error('店舗取得×', error);
-        setStore(null);
-      });
+    setIsLoading(true);
+    setStoreError(null);
+    setStore(null);
 
-    getProducts(storeId)
-      .then(setProducts)
-      .catch((error) => {
-        console.error('商品取得×', error);
-        setProducts([]);
-      });
+    try {
+      const result = await getStore(storeId);
+      setStore(result);
+    } catch (error) {
+      setStore(null);
+      setStoreError(
+        error instanceof ApiError && error.status === 404
+          ? 'not-found'
+          : 'request-failed',
+      );
+    } finally {
+      setIsLoading(false);
+    }
   }, [storeId]);
 
-  if (!store) {
+  const loadProducts = useCallback(async () => {
+    if (!storeId) {
+      setProducts([]);
+      setProductsError(true);
+      return;
+    }
+
+    setIsProductsLoading(true);
+    setProductsError(false);
+
+    try {
+      const result = await getProducts(storeId);
+      setProducts(result);
+    } catch {
+      setProducts([]);
+      setProductsError(true);
+    } finally {
+      setIsProductsLoading(false);
+    }
+  }, [storeId]);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const fetchData = async () => {
+      if (!storeId) {
+        setStore(null);
+        setStoreError('not-found');
+        setIsLoading(false);
+        setProducts([]);
+        setIsProductsLoading(false);
+        return;
+      }
+
+      setIsLoading(true);
+      setStore(null);
+      setStoreError(null);
+      setProducts([]);
+      setIsProductsLoading(false);
+      setProductsError(false);
+
+      try {
+        const storeResult = await getStore(storeId);
+
+        if (cancelled) return;
+
+        setStore(storeResult);
+        setIsLoading(false);
+        setIsProductsLoading(true);
+
+        try {
+          const productResults = await getProducts(storeId);
+
+          if (!cancelled) {
+            setProducts(productResults);
+          }
+        } catch (error) {
+          if (!cancelled) {
+            console.error('商品取得に失敗しました', error);
+            setProducts([]);
+            setProductsError(true);
+          }
+        } finally {
+          if (!cancelled) {
+            setIsProductsLoading(false);
+          }
+        }
+      } catch (error) {
+        if (cancelled) return;
+
+        console.error('店舗取得に失敗しました', error);
+        setStoreError(
+          error instanceof ApiError && error.status === 404
+            ? 'not-found'
+            : 'request-failed',
+        );
+      } finally {
+        if (!cancelled) {
+          setIsLoading(false);
+        }
+      }
+    };
+
+    void fetchData();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [storeId]);
+
+  if (isLoading) {
+    return (
+      <div className="page-stack" role="status" aria-live="polite">
+        店舗情報を読み込んでいます...
+      </div>
+    );
+  }
+
+  if (storeError === 'not-found') {
     return (
       <EmptyState
         icon={<StoreIcon size={32} />}
         title="店舗が見つかりません"
         description="商品一覧から店舗を選び直してください。"
         action={<ButtonLink to={paths.products}>商品一覧へ</ButtonLink>}
+      />
+    );
+  }
+
+  if (storeError === 'request-failed' || !store) {
+    return (
+      <EmptyState
+        icon={<StoreIcon size={32} />}
+        title="店舗情報を取得できませんでした"
+        description="通信に失敗したか、サーバーで問題が発生しました。時間をおいて再度お試しください。"
+        action={
+          <div className="page-stack">
+            <Button onClick={() => void loadStore()}>再試行</Button>
+            <ButtonLink to={paths.products} variant="secondary">
+              商品一覧へ戻る
+            </ButtonLink>
+          </div>
+        }
       />
     );
   }
@@ -75,22 +205,42 @@ export function StorePage() {
       <section>
         <div className="section-title-row">
           <h2>出品商品</h2>
-          <span>{products.length}件</span>
+          <span>{productsError ? '' : `${products.length}件`}</span>
         </div>
 
-        {products.length > 0 ? (
-          <div className="product-grid">
-            {products.map((product) => (
-              <ProductCard product={product} store={store} key={product.id} />
-            ))}
-          </div>
-        ) : (
+        {isProductsLoading && <p role="status">商品を読み込んでいます...</p>}
+
+        {productsError && (
           <EmptyState
             icon={<PackageSearch size={30} />}
-            title="まだ商品がありません"
-            description="商品が出品されると、ここに一覧表示されます。"
+            title="商品を取得できませんでした"
+            description="通信状況を確認して、もう一度お試しください。"
+            action={
+              <Button
+                onClick={() => void loadProducts()}
+                disabled={isProductsLoading}
+              >
+                再試行
+              </Button>
+            }
           />
         )}
+
+        {!isProductsLoading &&
+          !productsError &&
+          (products.length > 0 ? (
+            <div className="product-grid">
+              {products.map((product) => (
+                <ProductCard product={product} store={store} key={product.id} />
+              ))}
+            </div>
+          ) : (
+            <EmptyState
+              icon={<PackageSearch size={30} />}
+              title="まだ商品がありません"
+              description="商品が出品されると、ここに一覧表示されます。"
+            />
+          ))}
       </section>
     </div>
   );
