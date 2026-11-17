@@ -1,8 +1,9 @@
 import { ArrowLeft, CreditCard, Package } from 'lucide-react';
-import { type FormEvent, useEffect, useState } from 'react';
+import { type FormEvent, useCallback, useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 
 import { getProduct } from '@/api/products';
+import { ApiError } from '@/api/client';
 import { useDemoStore } from '@/app/demo-store-context';
 import { paths } from '@/app/paths';
 import {
@@ -16,29 +17,88 @@ import { EmptyState } from '@/shared/ui/EmptyState';
 import { ProductVisual } from '@/shared/ui/ProductVisual';
 import { StepIndicator } from '@/shared/ui/StepIndicator';
 
+type ProductLoadError = 'not-found' | 'unavailable';
+
 export function CheckoutPage() {
   const { productId = '' } = useParams();
   const navigate = useNavigate();
   const { activeUser } = useDemoStore();
 
   const [product, setProduct] = useState<Product | null>(null);
-
   const [isLoading, setIsLoading] = useState(true);
+  const [loadError, setLoadError] = useState<ProductLoadError | null>(null);
+
   const [draft, setDraft] = useState<CheckoutDraft>({
     ...DEFAULT_CHECKOUT_DRAFT,
     name: activeUser?.displayName ?? '',
   });
 
-  useEffect(() => {
-    if (!productId) return;
+  const loadProduct = useCallback(async () => {
+    if (!productId) {
+      setProduct(null);
+      setLoadError('not-found');
+      setIsLoading(false);
+      return;
+    }
 
-    getProduct(productId)
-      .then((product) => {
-        setProduct(product);
-      })
-      .finally(() => {
+    setIsLoading(true);
+    setLoadError(null);
+
+    try {
+      const latestProduct = await getProduct(productId);
+      setProduct(latestProduct);
+    } catch (error) {
+      setProduct(null);
+
+      if (error instanceof ApiError && error.status === 404) {
+        setLoadError('not-found');
+      } else {
+        setLoadError('unavailable');
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  }, [productId]);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const fetchProduct = async () => {
+      if (!productId) {
+        setProduct(null);
+        setLoadError('not-found');
         setIsLoading(false);
-      });
+        return;
+      }
+
+      try {
+        const latestProduct = await getProduct(productId);
+
+        if (cancelled) return;
+
+        setProduct(latestProduct);
+        setLoadError(null);
+        setIsLoading(false);
+      } catch (error) {
+        if (cancelled) return;
+
+        setProduct(null);
+
+        if (error instanceof ApiError && error.status === 404) {
+          setLoadError('not-found');
+        } else {
+          setLoadError('unavailable');
+        }
+
+        setIsLoading(false);
+      }
+    };
+
+    void fetchProduct();
+
+    return () => {
+      cancelled = true;
+    };
   }, [productId]);
 
   if (isLoading) {
@@ -46,6 +106,28 @@ export function CheckoutPage() {
       <div className="narrow-page page-stack">
         <p>商品情報を読み込んでいます...</p>
       </div>
+    );
+  }
+
+  if (loadError === 'not-found') {
+    return (
+      <EmptyState
+        icon={<Package size={32} />}
+        title="商品が見つかりません"
+        description="商品が削除されたか、URLが正しくありません。"
+        action={<ButtonLink to={paths.products}>商品一覧へ</ButtonLink>}
+      />
+    );
+  }
+
+  if (loadError === 'unavailable') {
+    return (
+      <EmptyState
+        icon={<Package size={32} />}
+        title="商品情報を取得できませんでした"
+        description="通信またはサーバーで問題が発生しました。時間をおいて再度お試しください。"
+        action={<Button onClick={() => void loadProduct()}>再試行する</Button>}
+      />
     );
   }
 
@@ -60,8 +142,9 @@ export function CheckoutPage() {
     );
   }
 
-  const cannotPurchase =
-    product.status === 'sold' || product.sellerId === activeUser?.id;
+  const isSold = product.status === 'sold';
+  const isOwnProduct = product.sellerId === activeUser?.id;
+  const cannotPurchase = isSold || isOwnProduct;
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -89,6 +172,20 @@ export function CheckoutPage() {
 
         <h1>購入情報</h1>
       </div>
+
+      {isSold && (
+        <div className="panel" role="status">
+          <strong>この商品は売却済みです。</strong>
+          <p>現在購入することはできません。</p>
+        </div>
+      )}
+
+      {isOwnProduct && !isSold && (
+        <div className="panel" role="status">
+          <strong>自分が出品した商品です。</strong>
+          <p>自分の商品を購入することはできません。</p>
+        </div>
+      )}
 
       <form className="checkout-grid" onSubmit={handleSubmit}>
         <section className="panel checkout-form-panel">
@@ -179,7 +276,6 @@ export function CheckoutPage() {
 
             <div>
               <strong>{product.name}</strong>
-              <span>数量 1</span>
             </div>
           </div>
 
