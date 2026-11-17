@@ -116,7 +116,6 @@ export function ProductListPage() {
   return (
     <div className="page-stack">
       {pageHeader}
-
       <section className="catalog-tools" aria-label="商品を検索">
         <label className="search-field">
           <Search size={19} aria-hidden="true" />
@@ -126,6 +125,7 @@ export function ProductListPage() {
             value={query}
             onChange={(event) => setQuery(event.target.value)}
             placeholder="商品名・説明から検索"
+            className="search_box"
           />
         </label>
         <span>{filteredProducts.length}件</span>
