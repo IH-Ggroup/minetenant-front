@@ -37,12 +37,10 @@ export function CheckoutReviewPage() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState('');
 
-  // CheckoutPageから引き継いだ購入情報
   const checkoutDraft =
     (location.state as { checkoutDraft?: CheckoutDraft } | null | undefined)
       ?.checkoutDraft ?? DEFAULT_CHECKOUT_DRAFT;
 
-  // 商品詳細を取得
   useEffect(() => {
     if (!productId) return;
 
