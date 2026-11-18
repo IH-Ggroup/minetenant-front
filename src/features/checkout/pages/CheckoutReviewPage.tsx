@@ -20,22 +20,22 @@ import { EmptyState } from '@/shared/ui/EmptyState';
 import { ProductVisual } from '@/shared/ui/ProductVisual';
 import { StepIndicator } from '@/shared/ui/StepIndicator';
 
+import {
+  getPurchaseRequestId,
+  clearPurchaseRequest,
+} from '@/features/checkout/purchase-request';
+
 export function CheckoutReviewPage() {
   const { productId = '' } = useParams();
   const location = useLocation();
   const navigate = useNavigate();
 
   const { activeUser } = useDemoStore();
-  // 商品はAPIから取得
   const [product, setProduct] = useState<Product | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState('');
-
-  // 購入ボタンを押した1回の操作につき1つ生成する
-  // 再送時は同じrequestIdを使用する
-  const [requestId] = useState(() => crypto.randomUUID());
 
   // CheckoutPageから引き継いだ購入情報
   const checkoutDraft =
@@ -88,9 +88,13 @@ export function CheckoutReviewPage() {
     setIsProcessing(true);
     setError('');
 
+    const requestId = getPurchaseRequestId(activeUser.id, product.id);
+
     try {
       const result = await purchaseProductApi(product.id, requestId);
+
       if (result.ok && result.transactionId) {
+        clearPurchaseRequest(activeUser.id, product.id, requestId);
         navigate(paths.purchaseComplete(result.transactionId));
         return;
       }
