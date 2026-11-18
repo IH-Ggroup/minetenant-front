@@ -135,7 +135,6 @@ export function CheckoutReviewPage() {
 
           <div>
             <h2>{product.name}</h2>
-            <p>数量 1</p>
           </div>
 
           <strong>{formatPrice(product.price)}</strong>
