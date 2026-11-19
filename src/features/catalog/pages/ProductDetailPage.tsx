@@ -169,68 +169,85 @@ export function ProductDetailPage() {
       </nav>
 
       <article className="product-detail">
-        <div className="product-detail__visual">
-          <ProductVisual
-            theme={product.theme}
-            emoji={product.emoji}
-            name={product.name}
-          />
-        </div>
-
-        <div className="product-detail__content">
-          <h1>{product.name}</h1>
-          <p className="product-detail__price">{formatPrice(product.price)}</p>
-          <p>{isSoldOut ? '売り切れ' : '販売中'}</p>
-
-          <div className="product-detail__description">
-            <h2>商品の説明</h2>
-            <p>{product.description}</p>
+        <div className="product-detail__main">
+          <div className="product-detail__visual">
+            <ProductVisual
+              theme={product.theme}
+              emoji={product.emoji}
+              name={product.name}
+            />
           </div>
 
-          {store && (
-            <Link className="seller-card" to={paths.store(store.id)}>
-              <span className="seller-card__details">
-                <small>出品店舗</small>
-                <strong>{store.name}</strong>
-              </span>
-              <span className="seller-card__link">店舗を見る</span>
-            </Link>
-          )}
+          <div className="product-detail__content">
+            <h1>{product.name}</h1>
 
-          {isStoreLoading && <p role="status">店舗情報を読み込んでいます...</p>}
-
-          {storeError && (
-            <div role="alert">
-              <p>店舗情報を取得できませんでした。</p>
-              <Button
-                variant="secondary"
-                onClick={() => void loadStore(product.storeId)}
+            <div className="product-detail__price-row">
+              <p className="product-detail__price">
+                {formatPrice(product.price)}
+              </p>
+              <span
+                className={`product-card__status ${
+                  isSoldOut
+                    ? 'product-card__status--sold'
+                    : 'product-card__status--available'
+                }`}
               >
-                店舗情報を再試行
-              </Button>
+                {isSoldOut ? '売り切れ' : '販売中'}
+              </span>
             </div>
-          )}
 
-          {isOwnProduct ? (
-            <div className="page-stack">
-              <p role="status">自分の出品商品は購入できません。</p>
-              <ButtonLink to={paths.storeManage} variant="secondary" fullWidth>
-                自分の出品を管理する
+            {isOwnProduct ? (
+              <div className="page-stack">
+                <p role="status">自分の出品商品は購入できません。</p>
+                <ButtonLink to={paths.storeManage} variant="secondary" fullWidth>
+                  自分の出品を管理する
+                </ButtonLink>
+              </div>
+            ) : isSoldOut ? (
+              <div className="page-stack">
+                <p role="status">売り切れのため購入できません。</p>
+                <Button fullWidth disabled aria-disabled="true">
+                  売り切れです
+                </Button>
+              </div>
+            ) : (
+              <ButtonLink to={paths.checkout(product.id)} fullWidth>
+                購入手続きへ進む
               </ButtonLink>
-            </div>
-          ) : isSoldOut ? (
-            <div className="page-stack">
-              <p role="status">売り切れのため購入できません。</p>
-              <Button fullWidth disabled aria-disabled="true">
-                売り切れです
-              </Button>
-            </div>
-          ) : (
-            <ButtonLink to={paths.checkout(product.id)} fullWidth>
-              購入手続きへ進む
-            </ButtonLink>
-          )}
+            )}
+          </div>
         </div>
+
+        <div className="product-detail__description">
+          <h2>商品の説明</h2>
+          <p>{product.description}</p>
+        </div>
+
+        {store && (
+          <Link className="seller-card" to={paths.store(store.id)}>
+            <span className="seller-card__details">
+              <small>出品店舗</small>
+              <strong>{store.name}</strong>
+            </span>
+            <span className="seller-card__link">店舗を見る　　＞</span>
+          </Link>
+        )}
+
+        {isStoreLoading && (
+          <p role="status">店舗情報を読み込んでいます...</p>
+        )}
+
+        {storeError && (
+          <div role="alert">
+            <p>店舗情報を取得できませんでした。</p>
+            <Button
+              variant="secondary"
+              onClick={() => void loadStore(product.storeId)}
+            >
+              店舗情報を再試行
+            </Button>
+          </div>
+        )}
       </article>
     </div>
   );
