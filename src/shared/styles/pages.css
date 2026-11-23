@@ -8,30 +8,152 @@
 .auth-card__heading {
   margin-bottom: 24px;
 }
+.PageHeader {
+  font-size: 25px;
+}
 
 .catalog-tools {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: 12px 16px;
+  width: 88%;
+  margin: 0 auto;
 }
 
+/* 検索欄全体 */
+.search-field {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  box-sizing: border-box;
+  width: 100%;
+  height: 48px;
+  padding: 0 12px;
+  border: 2px solid #b5ac9e;
+  color: #806b55;
+  transition: border-color 0.2s;
+}
+
+/* 商品一覧画面での検索欄の幅 */
 .catalog-tools .search-field {
   width: min(100%, 440px);
-  margin-bottom: 0;
 }
 
-/* 商品一覧は横幅を使って2列に並べ、右側だけが空かないようにします。 */
+/* 入力部分 */
+.search_box {
+  flex: 1;
+  min-width: 0;
+  padding: 0;
+  border: none;
+  outline: none;
+  color: #493b2d;
+  font-size: 14px;
+}
+
+/* プレースホルダー */
+.search_box::placeholder {
+  color: #a39787;
+}
+
+/* フォーカス時 */
+.search-field:focus-within {
+  border-color: #806b55;
+}
+
 .product-grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 8px 32px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  width: 88%;
+  max-width: 1100px;
+  margin: 16px auto 0 auto;
+  padding-bottom: 100px;
+}
+
+.product-grid .product-card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  border: 1px solid #c8b9a8;
+  padding: 16px;
+}
+
+.product-card__visual-link {
+  position: relative;
+}
+
+.product-card__sold-badge {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  padding: 6px 12px;
+  background-color: rgba(55, 55, 55, 0.6);
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 600;
+  border-radius: 4px;
+  white-space: nowrap;
+}
+
+/* 販売状態の共通デザイン */
+.product-card__status {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* 販売中 */
+.product-card__status--available {
+  color: #28734b;
+  background-color: #e2f2e8;
+}
+
+/* 売り切れ */
+.product-card__status--sold {
+  color: #444444;
+  background-color: #dddddd;
 }
 
 @media (max-width: 800px) {
   .product-grid {
     grid-template-columns: minmax(0, 1fr);
   }
+}
+
+.product-card h2 a {
+  color: var(--color-text);
+}
+
+.product-grid .product-card {
+  transition: background-color 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.product-grid .product-card:hover {
+  background-color: #f2f0ec;
+  transform: none;
+}
+
+.product-card__visual-link {
+  position: relative;
+  display: block;
+  width: fit-content;
+  max-width: 100%;
+  margin: 0 auto;
+}
+
+.product-card__body {
+  width: fit-content;
+  max-width: 100%;
+  margin: 0 auto;
+  text-align: left;
 }
 
 .product-detail,

@@ -22,23 +22,22 @@ export async function getProducts(storeId?: string): Promise<Product[]> {
   products.forEach(validateProduct);
   return products;
 }
-
-/* 商品を出品  */
+//出品
 export async function createProduct(
   input: CreateProductInput,
 ): Promise<Product> {
   // Ownership comes from the authenticated session, never from client IDs.
-  const { name, description, price, stock, category, theme, emoji } = input;
+  const { requestId, name, description, price, category, theme, emoji } = input;
   return apiRequest<Product>('/products', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
+      requestId,
       name,
       description,
       price,
-      stock,
       category,
       theme,
       emoji,
