@@ -2,7 +2,7 @@ import { ArrowRight, CheckCircle2, Package, UserRound } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 
-import { getProduct, getTransaction } from '@/api/products';
+import { getProduct, getTransactions } from '@/api/products';
 import { useDemoStore } from '@/app/demo-store-context';
 import { paths } from '@/app/paths';
 import type { Product, Transaction } from '@/domain/models';
@@ -27,10 +27,22 @@ export function PurchaseCompletePage() {
 
     const loadPurchaseResult = async () => {
       try {
-        const currentTransaction = await getTransaction(transactionId);
+        // ユーザーに関係する取引を取得
+        const transactions = await getTransactions();
+
+        // 今回購入した取引をtransactionIdから特定
+        const currentTransaction = transactions.find(
+          (item) => item.id === transactionId,
+        );
+
+        if (!currentTransaction) {
+          return;
+        }
+
         setTransaction(currentTransaction);
 
         const currentProduct = await getProduct(currentTransaction.productId);
+
         setProduct(currentProduct);
       } catch {
         setTransaction(null);
@@ -43,6 +55,7 @@ export function PurchaseCompletePage() {
     loadPurchaseResult();
   }, [transactionId, activeUser]);
 
+  // API取得中
   if (isLoading) {
     return (
       <div className="narrow-page page-stack">
@@ -51,6 +64,7 @@ export function PurchaseCompletePage() {
     );
   }
 
+  // ログインしていない
   if (!activeUser) {
     return (
       <EmptyState
@@ -62,6 +76,7 @@ export function PurchaseCompletePage() {
     );
   }
 
+  // API取得失敗
   if (!transaction || !product) {
     return (
       <EmptyState
