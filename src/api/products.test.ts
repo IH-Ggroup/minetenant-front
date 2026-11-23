@@ -86,7 +86,7 @@ describe('Products API with authenticated ownership', () => {
 
     await expect(products.getProduct(product.id)).resolves.toEqual(product);
   });
-  //
+
   it('does not accept an unknown product status', async () => {
     const product = {
       ...INITIAL_PRODUCTS[0],
@@ -237,6 +237,47 @@ describe('Products API with authenticated ownership', () => {
 
     await expect(
       products.getPurchaseByRequestId('request-1'),
+    ).rejects.toMatchObject({
+      status: 404,
+    });
+
+    expect(fetchMock).toHaveBeenCalledOnce();
+  });
+  it('retrieves a transaction using an encoded transaction ID', async () => {
+    const transaction = {
+      id: 'transaction-1',
+      productId: 'product-1',
+      buyerId: 'user-1',
+      sellerId: 'seller-1',
+      source: 'web',
+      amount: 6800,
+      status: 'paid',
+      createdAt: '2026-09-04T02:00:00.000000Z',
+    };
+
+    fetchMock.mockResolvedValue(jsonResponse({ data: transaction }));
+
+    await expect(products.getTransaction('transaction /?')).resolves.toEqual(
+      transaction,
+    );
+
+    expect(fetchMock.mock.calls[0][0]).toBe(
+      `${BASE_URL}/transactions/transaction%20%2F%3F`,
+    );
+
+    expect(fetchMock.mock.calls[0][1]).toMatchObject({
+      method: 'GET',
+      credentials: 'include',
+    });
+  });
+
+  it('preserves 404 when a transaction does not exist', async () => {
+    fetchMock.mockResolvedValue(
+      jsonResponse({ message: '取引が見つかりません。' }, 404),
+    );
+
+    await expect(
+      products.getTransaction('transaction-1'),
     ).rejects.toMatchObject({
       status: 404,
     });
