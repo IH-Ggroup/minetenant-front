@@ -1,11 +1,14 @@
 import { ArrowLeft, Package } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 
 import {
   getProduct,
+  getPurchaseByRequestId,
   purchaseProduct as purchaseProductApi,
 } from '@/api/products';
+
+import { ApiError } from '@/api/client';
 
 import { useDemoStore } from '@/app/demo-store-context';
 import { paths } from '@/app/paths';
@@ -13,7 +16,7 @@ import {
   type CheckoutDraft,
   DEFAULT_CHECKOUT_DRAFT,
 } from '@/features/checkout/checkout-draft'; // 配送先情報を取得するAPIが未実装のため、既存のデモデータを使用
-import type { Product } from '@/domain/models';
+import type { Product, Transaction } from '@/domain/models';
 import { formatPrice } from '@/shared/lib/format';
 import { Button, ButtonLink } from '@/shared/ui/Button';
 import { EmptyState } from '@/shared/ui/EmptyState';
@@ -24,6 +27,62 @@ import {
   getPurchaseRequestId,
   clearPurchaseRequest,
 } from '@/features/checkout/purchase-request';
+
+//確認
+function isAmbiguousPurchaseError(error: unknown): boolean {
+  if (error instanceof ApiError) {
+    return (
+      error.status === 0 ||
+      error.status >= 500 ||
+      error.code === 'INVALID_RESPONSE'
+    );
+  }
+  return error instanceof DOMException && error.name === 'AbortError';
+}
+
+// POSTの通信結果が不明な場合の購入復元。
+async function purchaseWithRecovery(
+  productId: string,
+  requestId: string,
+): Promise<Transaction> {
+  try {
+    const result = await purchaseProductApi(productId, requestId);
+    if (!result.ok || !result.transactionId) {
+      throw new Error('購入処理に失敗しました。');
+    }
+    return {
+      id: result.transactionId,
+    } as Transaction;
+  } catch (error) {
+    if (!isAmbiguousPurchaseError(error)) {
+      throw error;
+    }
+  }
+  // POSTの結果が不明なのでGETで照会
+  try {
+    return await getPurchaseByRequestId(requestId);
+  } catch (lookupError) {
+    // 404以外は未成立と判断できないため再送しない
+    if (!(lookupError instanceof ApiError) || lookupError.status !== 404) {
+      throw lookupError;
+    }
+  }
+  try {
+    const result = await purchaseProductApi(productId, requestId);
+
+    if (!result.ok || !result.transactionId) {
+      throw new Error('購入処理に失敗しました。');
+    }
+    return {
+      id: result.transactionId,
+    } as Transaction;
+  } catch (retryError) {
+    if (!isAmbiguousPurchaseError(retryError)) {
+      throw retryError;
+    }
+  }
+  return getPurchaseByRequestId(requestId);
+}
 
 export function CheckoutReviewPage() {
   const { productId = '' } = useParams();
@@ -36,6 +95,8 @@ export function CheckoutReviewPage() {
 
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState('');
+
+  const processingRef = useRef(false);
 
   const checkoutDraft =
     (location.state as { checkoutDraft?: CheckoutDraft } | null | undefined)
@@ -80,29 +141,29 @@ export function CheckoutReviewPage() {
       setError('ログインしてください。');
       return;
     }
-
+    if (processingRef.current) return;
+    processingRef.current = true;
     if (isProcessing) return;
-
     setIsProcessing(true);
     setError('');
 
     const requestId = getPurchaseRequestId(activeUser.id, product.id);
 
     try {
-      const result = await purchaseProductApi(product.id, requestId);
+      const transaction = await purchaseWithRecovery(product.id, requestId);
 
-      if (result.ok && result.transactionId) {
-        clearPurchaseRequest(activeUser.id, product.id, requestId);
-        navigate(paths.purchaseComplete(result.transactionId));
-        return;
-      }
+      // 購入成立を確認できた場合だけ保存情報を削除する。
+      clearPurchaseRequest(activeUser.id, product.id, requestId);
 
-      setError(result.error ?? '購入処理に失敗しました。');
+      navigate(paths.purchaseComplete(transaction.id));
     } catch (error) {
       setError(
-        error instanceof Error ? error.message : '購入処理に失敗しました。',
+        error instanceof Error
+          ? error.message
+          : '購入結果を確認できませんでした。同じ購入操作から再度お試しください。',
       );
     } finally {
+      processingRef.current = false;
       setIsProcessing(false);
     }
   };

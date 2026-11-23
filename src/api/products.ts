@@ -69,6 +69,15 @@ export async function purchaseProduct(
   };
 }
 
+/* requestIdから購入結果を取得 */
+export async function getPurchaseByRequestId(
+  requestId: string,
+): Promise<Transaction> {
+  return apiRequest<Transaction>(
+    `/purchases/requests/${encodeURIComponent(requestId)}`,
+  );
+}
+
 /* 店舗情報を取得 */
 export async function getStore(storeId: string): Promise<Store> {
   return apiRequest<Store>(`/stores/${encodeURIComponent(storeId)}`);
