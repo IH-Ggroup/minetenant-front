@@ -8,24 +8,114 @@
 .auth-card__heading {
   margin-bottom: 24px;
 }
+.PageHeader {
+  font-size: 25px;
+}
 
 .catalog-tools {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: 12px 16px;
+  width: 88%;
+  margin: 0 auto;
 }
 
+/* 検索欄全体 */
+.search-field {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  box-sizing: border-box;
+  width: 100%;
+  height: 48px;
+  padding: 0 12px;
+  border: 2px solid #b5ac9e;
+  color: #806b55;
+  transition: border-color 0.2s;
+}
+
+/* 商品一覧画面での検索欄の幅 */
 .catalog-tools .search-field {
   width: min(100%, 440px);
-  margin-bottom: 0;
 }
 
-/* 商品一覧は横幅を使って2列に並べ、右側だけが空かないようにします。 */
+/* 入力部分 */
+.search_box {
+  flex: 1;
+  min-width: 0;
+  padding: 0;
+  border: none;
+  outline: none;
+  color: #493b2d;
+  font-size: 14px;
+}
+
+/* プレースホルダー */
+.search_box::placeholder {
+  color: #a39787;
+}
+
+/* フォーカス時 */
+.search-field:focus-within {
+  border-color: #806b55;
+}
+
 .product-grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 8px 32px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  width: 88%;
+  max-width: 1100px;
+  margin: 16px auto 0 auto;
+  padding-bottom: 100px;
+}
+
+.product-grid .product-card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  border: 1px solid #c8b9a8;
+  padding: 16px;
+}
+
+.product-card__visual-link {
+  position: relative;
+}
+
+.product-card__sold-badge {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  padding: 6px 12px;
+  background-color: rgba(55, 55, 55, 0.6);
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 600;
+  border-radius: 4px;
+  white-space: nowrap;
+}
+
+/* 販売状態の共通デザイン */
+.product-card__status {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* 販売中 */
+.product-card__status--available {
+  color: #28734b;
+  background-color: #e2f2e8;
+}
+
+/* 売り切れ */
+.product-card__status--sold {
+  color: #444444;
+  background-color: #dddddd;
 }
 
 @media (max-width: 800px) {
@@ -34,45 +124,219 @@
   }
 }
 
+.product-card h2 a {
+  color: var(--color-text);
+}
+
+.product-grid .product-card {
+  transition: background-color 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.product-grid .product-card:hover {
+  background-color: #f2f0ec;
+  transform: none;
+}
+
+.product-card__visual-link {
+  position: relative;
+  display: block;
+  width: fit-content;
+  max-width: 100%;
+  margin: 0 auto;
+}
+/* 商品一覧の画像領域をカードの中央に配置 */
+.product-grid .product-card__visual-link {
+  display: block;
+  width: 100%;
+  max-width: 380px;
+  margin: 0 auto;
+}
+
+/* 画像領域の中身も中央に配置 */
+.product-grid .product-visual {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.product-card__body {
+  width: fit-content;
+  max-width: 100%;
+  margin: 0 auto;
+  text-align: left;
+}
+
 .product-detail,
 .order-summary {
   max-width: 760px;
 }
 
-.seller-card {
-  display: block;
-  margin-block: 20px;
+/* ==========================
+   商品詳細画面
+========================== */
+
+/* 商品詳細画面全体 */
+.product-detail {
+  max-width: 760px;
+  margin: 0 auto;
+  padding-bottom: 100px;
 }
 
-.checkout-grid {
-  display: grid;
+/* 商品画像と商品情報の横並び */
+.product-detail__main {
+  display: flex;
   gap: 24px;
 }
 
-.order-summary__product,
-.review-product,
-.completion-summary__product {
+/* 左右の幅を均等にする */
+.product-detail__visual,
+.product-detail__content {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+/* 商品画像の中央揃え */
+.product-detail__visual {
   display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* 商品画像領域 */
+.product-detail__visual .product-visual {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* 商品名 */
+.product-detail__content h1 {
+  margin: 0 0 16px;
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+/* 価格と販売状況 */
+.product-detail__price-row {
+  display: flex;
+  align-items: center;
   flex-wrap: wrap;
-  align-items: baseline;
-  gap: 12px 24px;
+  gap: 12px;
+  margin-bottom: 24px;
 }
 
-.order-summary__product > div:not(.product-visual) {
-  display: grid;
-  gap: 4px;
+/* 商品価格 */
+.product-detail__price {
+  margin: 0;
+  font-size: 26px;
+  font-weight: 700;
+  line-height: 1.4;
 }
 
-.product-detail__description p,
-.review-list dd {
+/* 商品説明 */
+
+/* 商品説明 */
+.product-detail__description {
+  margin-top: 32px;
+  padding: 20px 12px;
+  border-top: 1px solid #d8cbbb;
+}
+
+/* 商品説明の見出し */
+.product-detail__description h2 {
+  margin: 0 0 14px;
+  font-size: 17px;
+  font-weight: 700;
+}
+
+/* 商品説明の本文 */
+.product-detail__description p {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.9;
   white-space: pre-wrap;
+  overflow-wrap: anywhere;
 }
 
-.auth-card__switch,
-.product-detail__description,
-.transaction-row,
-.sync-stage__actions {
-  margin-top: 20px;
+/* 出品店舗カード */
+.product-detail .seller-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 16px;
+  padding: 18px 20px;
+  text-decoration: none;
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+/* 出品店舗情報 */
+.product-detail .seller-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 16px;
+  padding: 20px 12px;
+  border-top: 1px solid #d8cbbb;
+  color: var(--color-text);
+  text-decoration: none;
+  transition: background-color 0.2s ease;
+}
+
+/* 店舗情報 */
+.product-detail .seller-card__details {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+/* 出品店舗のラベル */
+.product-detail .seller-card__details small {
+  font-size: 17px;
+  font-weight: 700;
+}
+
+/* 店舗名 */
+.product-detail .seller-card__details strong {
+  color: var(--color-text);
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+/* 店舗を見る */
+.product-detail .seller-card__link {
+  flex-shrink: 0;
+  padding: 0;
+  background: none;
+  color: #806b55;
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+/* ホバー時だけ薄い白色の背景 */
+.product-detail .seller-card:hover {
+  background-color: #f8f7f4;
+}
+
+/* キーボード操作時 */
+.product-detail .seller-card:focus-visible {
+  outline: 2px solid #806b55;
+  outline-offset: 3px;
 }
 
 .seller-card__details,

@@ -2,49 +2,136 @@ import { PackagePlus } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 
+import { ApiError } from '@/api/client';
 import { getStoreDashboard } from '@/api/products';
 import { useDemoStore } from '@/app/demo-store-context';
 import { paths } from '@/app/paths';
 import type { StoreDashboard } from '@/domain/models';
 import { formatPrice } from '@/shared/lib/format';
 import { Badge } from '@/shared/ui/Badge';
-import { ButtonLink } from '@/shared/ui/Button';
+import { Button, ButtonLink } from '@/shared/ui/Button';
 import { PageHeader } from '@/shared/ui/PageHeader';
+
+type DashboardError = 'forbidden' | 'request-failed' | 'missing-store';
 
 export function StoreManagePage() {
   const { activeUser } = useDemoStore();
+  const storeId = activeUser?.storeId;
+
   const [dashboard, setDashboard] = useState<StoreDashboard | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<DashboardError | null>(null);
+  const [retryCount, setRetryCount] = useState(0);
 
   useEffect(() => {
-    if (!activeUser || activeUser.storeId === null) {
-      return;
-    }
+    let cancelled = false;
 
-    getStoreDashboard(activeUser.storeId)
-      .then(setDashboard)
-      .catch((error) => {
-        console.error('店舗ダッシュボード取得×', error);
-        setDashboard(null);
-      });
-  }, [activeUser]);
+    const fetchDashboard = async () => {
+      setDashboard(null);
+      setError(null);
 
-  if (!dashboard) {
-    return null;
+      if (!storeId) {
+        setIsLoading(false);
+        setError('missing-store');
+        return;
+      }
+
+      setIsLoading(true);
+
+      try {
+        const result = await getStoreDashboard(storeId);
+
+        if (!cancelled) {
+          setDashboard(result);
+        }
+      } catch (fetchError) {
+        if (!cancelled) {
+          setError(
+            fetchError instanceof ApiError && fetchError.status === 403
+              ? 'forbidden'
+              : 'request-failed',
+          );
+        }
+      } finally {
+        if (!cancelled) {
+          setIsLoading(false);
+        }
+      }
+    };
+
+    void fetchDashboard();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [storeId, retryCount]);
+
+  const pageHeader = (
+    <PageHeader
+      title="店舗管理"
+      description="店舗情報と出品商品を確認するための基本画面です。"
+      actions={
+        <ButtonLink to={paths.sell} leadingIcon={<PackagePlus size={18} />}>
+          商品を出品
+        </ButtonLink>
+      }
+    />
+  );
+
+  if (isLoading) {
+    return (
+      <div className="page-stack">
+        {pageHeader}
+        <div role="status" aria-live="polite">
+          店舗情報を読み込んでいます...
+        </div>
+      </div>
+    );
+  }
+
+  if (error || !dashboard) {
+    return (
+      <div className="page-stack">
+        {pageHeader}
+
+        <section className="panel" role="alert">
+          {error === 'forbidden' ? (
+            <>
+              <h2>店舗情報を表示できません</h2>
+              <p>
+                この店舗情報を閲覧する権限がありません。
+                ログイン中のアカウントと本人のstoreIdを確認してください。
+              </p>
+            </>
+          ) : error === 'missing-store' ? (
+            <>
+              <h2>管理する店舗がありません</h2>
+              <p>
+                ログイン中のアカウントに店舗が登録されているか確認してください。
+              </p>
+            </>
+          ) : (
+            <>
+              <h2>店舗情報を取得できませんでした</h2>
+              <p>
+                通信に失敗したか、サーバーで問題が発生しました。
+                時間をおいて再度お試しください。
+              </p>
+              <Button onClick={() => setRetryCount((count) => count + 1)}>
+                再試行
+              </Button>
+            </>
+          )}
+        </section>
+      </div>
+    );
   }
 
   const { store, products, stats } = dashboard;
 
   return (
     <div className="page-stack">
-      <PageHeader
-        title="店舗管理"
-        description="店舗情報と出品商品を確認するための基本画面です。"
-        actions={
-          <ButtonLink to={paths.sell} leadingIcon={<PackagePlus size={18} />}>
-            商品を出品
-          </ButtonLink>
-        }
-      />
+      {pageHeader}
 
       <div className="management-grid">
         <section className="panel">
@@ -89,7 +176,7 @@ export function StoreManagePage() {
           >
             <div className="inventory-table__head" role="row">
               <span role="columnheader">商品</span>
-              <span role="columnheader">在庫</span>
+              <span role="columnheader">販売状態</span>
               <span role="columnheader">確認</span>
             </div>
 
@@ -108,7 +195,7 @@ export function StoreManagePage() {
                       product.status === 'available' ? 'success' : 'warning'
                     }
                   >
-                    {product.status === 'available' ? '販売中' : '売り切れ'}
+                    {product.status === 'available' ? '販売中' : '売却済み'}
                   </Badge>
                 </span>
 
