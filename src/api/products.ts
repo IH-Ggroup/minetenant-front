@@ -105,6 +105,15 @@ export async function getTransactions(): Promise<Transaction[]> {
   return apiRequest<Transaction[]>('/transactions');
 }
 
+/* 取引詳細を取得 */
+export async function getTransaction(
+  transactionId: string,
+): Promise<Transaction> {
+  return apiRequest<Transaction>(
+    `/transactions/${encodeURIComponent(transactionId)}`,
+  );
+}
+
 function validateProduct(product: Product): Product {
   if (product.status !== 'available' && product.status !== 'sold') {
     throw new Error(`Invalid product status: ${product.status}`);
