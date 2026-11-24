@@ -108,3 +108,13 @@ export interface StoreDashboard {
   stats: StoreDashboardStats;
   recentTransactions: Transaction[];
 }
+
+export interface StoreGrowth {
+  storeId: string;
+  level: number;
+  points: number;
+  nextLevelPoints: number;
+  levelProgressPercent: number;
+  maxLevel: number;
+  isMaxLevel: boolean;
+}

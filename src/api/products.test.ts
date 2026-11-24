@@ -297,4 +297,124 @@ describe('Products API with authenticated ownership', () => {
 
     expect(fetchMock).toHaveBeenCalledOnce();
   });
+
+  describe('getStoreGrowth', () => {
+    const growth = {
+      storeId: 'store-mine',
+      level: 3,
+      points: 420,
+      nextLevelPoints: 180,
+      levelProgressPercent: 40,
+      maxLevel: 5,
+      isMaxLevel: false,
+    };
+
+    it('returns store growth from the API data payload', async () => {
+      fetchMock.mockResolvedValue(
+        jsonResponse({
+          data: growth,
+        }),
+      );
+      await expect(products.getStoreGrowth('store-mine')).resolves.toEqual(
+        growth,
+      );
+      expect(fetchMock.mock.calls[0][0]).toBe(
+        `${BASE_URL}/stores/store-mine/growth`,
+      );
+    });
+    it('retrieves growth using an encoded store ID', async () => {
+      fetchMock.mockResolvedValue(
+        jsonResponse({
+          data: {
+            ...growth,
+            storeId: 'store /?',
+          },
+        }),
+      );
+      await expect(products.getStoreGrowth('store /?')).resolves.toEqual({
+        ...growth,
+        storeId: 'store /?',
+      });
+      expect(fetchMock.mock.calls[0][0]).toBe(
+        `${BASE_URL}/stores/store%20%2F%3F/growth`,
+      );
+    });
+    it('uses GET without requiring authentication headers', async () => {
+      fetchMock.mockResolvedValue(
+        jsonResponse({
+          data: growth,
+        }),
+      );
+      await products.getStoreGrowth('store-mine');
+      const request = fetchMock.mock.calls[0][1]!;
+      expect(request).toMatchObject({
+        method: 'GET',
+        credentials: 'include',
+      });
+      expect(new Headers(request.headers).get('Accept')).toBe(
+        'application/json',
+      );
+      expect(new Headers(request.headers).get('X-XSRF-TOKEN')).toBeNull();
+    });
+    it('preserves 404 when the store does not exist', async () => {
+      fetchMock.mockResolvedValue(
+        jsonResponse(
+          {
+            message: '店舗が見つかりません。',
+          },
+          404,
+        ),
+      );
+      await expect(
+        products.getStoreGrowth('unknown-store'),
+      ).rejects.toMatchObject({
+        status: 404,
+      });
+      expect(fetchMock).toHaveBeenCalledOnce();
+    });
+    it('preserves 401 errors', async () => {
+      fetchMock.mockResolvedValue(
+        jsonResponse(
+          {
+            message: '認証が必要です。',
+          },
+          401,
+        ),
+      );
+      await expect(products.getStoreGrowth('store-mine')).rejects.toMatchObject(
+        {
+          status: 401,
+        },
+      );
+      expect(fetchMock).toHaveBeenCalledOnce();
+    });
+    it('preserves 403 errors', async () => {
+      fetchMock.mockResolvedValue(
+        jsonResponse(
+          {
+            message: 'アクセスが拒否されました。',
+          },
+          403,
+        ),
+      );
+      await expect(products.getStoreGrowth('store-mine')).rejects.toMatchObject(
+        {
+          status: 403,
+        },
+      );
+      expect(fetchMock).toHaveBeenCalledOnce();
+    });
+    it('does not accept invalid JSON responses', async () => {
+      fetchMock.mockResolvedValue(
+        new Response('invalid json', {
+          status: 200,
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }),
+      );
+      await expect(products.getStoreGrowth('store-mine')).rejects.toThrow();
+      expect(fetchMock).toHaveBeenCalledOnce();
+    });
+  });
 });

@@ -5,6 +5,7 @@ import type {
   Product,
   Transaction,
   StoreDashboard,
+  StoreGrowth,
 } from '@/domain/models';
 
 import { apiRequest } from './client';
@@ -119,4 +120,10 @@ function validateProduct(product: Product): Product {
     throw new Error(`Invalid product status: ${product.status}`);
   }
   return product;
+}
+/* 店舗成長情報を取得 */
+export async function getStoreGrowth(storeId: string): Promise<StoreGrowth> {
+  return apiRequest<StoreGrowth>(
+    `/stores/${encodeURIComponent(storeId)}/growth`,
+  );
 }
