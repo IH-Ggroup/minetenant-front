@@ -199,7 +199,11 @@ export function ProductDetailPage() {
             {isOwnProduct ? (
               <div className="page-stack">
                 <p role="status">自分の出品商品は購入できません。</p>
-                <ButtonLink to={paths.storeManage} variant="secondary" fullWidth>
+                <ButtonLink
+                  to={paths.storeManage}
+                  variant="secondary"
+                  fullWidth
+                >
                   自分の出品を管理する
                 </ButtonLink>
               </div>
@@ -229,13 +233,11 @@ export function ProductDetailPage() {
               <small>出品店舗</small>
               <strong>{store.name}</strong>
             </span>
-            <span className="seller-card__link">店舗を見る　　＞</span>
+            <span className="seller-card__link">店舗を見る ＞</span>
           </Link>
         )}
 
-        {isStoreLoading && (
-          <p role="status">店舗情報を読み込んでいます...</p>
-        )}
+        {isStoreLoading && <p role="status">店舗情報を読み込んでいます...</p>}
 
         {storeError && (
           <div role="alert">
