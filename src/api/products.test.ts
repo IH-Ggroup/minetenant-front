@@ -200,7 +200,6 @@ describe('Products API with authenticated ownership', () => {
     });
     expect(fetchMock).toHaveBeenCalledOnce();
   });
-
   it('retrieves a purchase result using an encoded request ID', async () => {
     const transaction = {
       id: 'transaction-1',
