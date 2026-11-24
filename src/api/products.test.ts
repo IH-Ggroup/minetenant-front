@@ -200,4 +200,60 @@ describe('Products API with authenticated ownership', () => {
     });
     expect(fetchMock).toHaveBeenCalledOnce();
   });
+  it('retrieves a purchase result using an encoded request ID', async () => {
+    const transaction = {
+      id: 'transaction-1',
+      productId: 'product-1',
+      buyerId: 'user-1',
+      sellerId: 'seller-1',
+      source: 'web',
+      amount: 6800,
+      status: 'paid',
+      createdAt: '2026-09-04T02:00:00.000000Z',
+    };
+
+    fetchMock.mockResolvedValue(
+      jsonResponse({
+        data: transaction,
+      }),
+    );
+
+    await expect(
+      products.getPurchaseByRequestId('request /?'),
+    ).resolves.toEqual(transaction);
+
+    expect(fetchMock.mock.calls[0][0]).toBe(
+      `${BASE_URL}/purchases/requests/request%20%2F%3F`,
+    );
+
+    const request = fetchMock.mock.calls[0][1]!;
+
+    expect(request).toMatchObject({
+      method: 'GET',
+      credentials: 'include',
+    });
+
+    expect(new Headers(request.headers).get('Accept')).toBe('application/json');
+
+    expect(new Headers(request.headers).get('X-XSRF-TOKEN')).toBeNull();
+  });
+
+  it('preserves 404 when a purchase result does not exist', async () => {
+    fetchMock.mockResolvedValue(
+      jsonResponse(
+        {
+          message: '購入結果が見つかりません。',
+        },
+        404,
+      ),
+    );
+
+    await expect(
+      products.getPurchaseByRequestId('request-1'),
+    ).rejects.toMatchObject({
+      status: 404,
+    });
+
+    expect(fetchMock).toHaveBeenCalledOnce();
+  });
 });
