@@ -9,10 +9,10 @@
   margin-bottom: 24px;
 }
 
-.breadcrumbs a{
+.breadcrumbs a {
   color: var(--color-text);
 }
-.breadcrumbs a:hover{
+.breadcrumbs a:hover {
   text-decoration: underline;
 }
 
@@ -347,7 +347,6 @@
   outline-offset: 3px;
 }
 
-
 /* ==========================
    商品詳細画面
 ========================== */
@@ -357,30 +356,29 @@
   margin: 0 auto;
 }
 
-.panel{
+.panel {
   border-bottom: 1px solid #d8cbbb;
 }
 
-.section-title-row{
+.section-title-row {
   display: flex;
   align-items: center;
   gap: 12px;
 }
 
-.panel__heading{
+.panel__heading {
   margin: 26px 0 0 0;
 }
-.panel__heading h2{
+.panel__heading h2 {
   margin: 0;
 }
-.shop-detail{
+.shop-detail {
   margin: 16px 0;
 }
 
-.store-product{
+.store-product {
   width: 100%;
 }
-
 
 .seller-card__details,
 .seller-card__details small,

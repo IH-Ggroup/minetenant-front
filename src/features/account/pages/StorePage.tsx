@@ -183,7 +183,7 @@ export function StorePage() {
       <nav className="breadcrumbs" aria-label="パンくず">
         <Link to={paths.products}>
           <ArrowLeft size={16} aria-hidden="true" />
-          ←　商品一覧
+          商品一覧
         </Link>
         <span aria-hidden="true">/</span>
         <span aria-current="page">{store.name}</span>
@@ -191,8 +191,8 @@ export function StorePage() {
 
       <div className="store-page">
         <PageHeader
-          title={store.name} 
-          actions={<Badge tone="success">Minecraft連携予定</Badge>} 
+          title={store.name}
+          actions={<Badge tone="success">Minecraft連携予定</Badge>}
         />
 
         <section className="panel">
@@ -231,7 +231,11 @@ export function StorePage() {
             (products.length > 0 ? (
               <div className="product-grid store-product">
                 {products.map((product) => (
-                  <ProductCard product={product} store={store} key={product.id} />
+                  <ProductCard
+                    product={product}
+                    store={store}
+                    key={product.id}
+                  />
                 ))}
               </div>
             ) : (
@@ -242,8 +246,7 @@ export function StorePage() {
               />
             ))}
         </section>
-      </div> 
-      
-    </div> 
+      </div>
+    </div>
   );
 }
