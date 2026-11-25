@@ -183,65 +183,67 @@ export function StorePage() {
       <nav className="breadcrumbs" aria-label="パンくず">
         <Link to={paths.products}>
           <ArrowLeft size={16} aria-hidden="true" />
-          商品一覧
+          ←　商品一覧
         </Link>
         <span aria-hidden="true">/</span>
         <span aria-current="page">{store.name}</span>
       </nav>
 
-      <PageHeader
-        title={store.name}
-        description="購入者から見える店舗ページの基本レイアウトです。"
-        actions={<Badge tone="success">Minecraft連携予定</Badge>}
-      />
+      <div className="store-page">
+        <PageHeader
+          title={store.name} 
+          actions={<Badge tone="success">Minecraft連携予定</Badge>} 
+        />
 
-      <section className="panel">
-        <div className="panel__heading">
-          <h2>店舗について</h2>
-        </div>
-        <p>{store.description}</p>
-      </section>
+        <section className="panel">
+          <div className="panel__heading">
+            <h2>店舗について</h2>
+          </div>
+          <p className="shop-detail">{store.description}</p>
+        </section>
 
-      <section>
-        <div className="section-title-row">
-          <h2>出品商品</h2>
-          <span>{productsError ? '' : `${products.length}件`}</span>
-        </div>
+        <section>
+          <div className="section-title-row">
+            <h2>出品商品</h2>
+            <span>{productsError ? '' : `${products.length}件`}</span>
+          </div>
 
-        {isProductsLoading && <p role="status">商品を読み込んでいます...</p>}
+          {isProductsLoading && <p role="status">商品を読み込んでいます...</p>}
 
-        {productsError && (
-          <EmptyState
-            icon={<PackageSearch size={30} />}
-            title="商品を取得できませんでした"
-            description="通信状況を確認して、もう一度お試しください。"
-            action={
-              <Button
-                onClick={() => void loadProducts()}
-                disabled={isProductsLoading}
-              >
-                再試行
-              </Button>
-            }
-          />
-        )}
-
-        {!isProductsLoading &&
-          !productsError &&
-          (products.length > 0 ? (
-            <div className="product-grid">
-              {products.map((product) => (
-                <ProductCard product={product} store={store} key={product.id} />
-              ))}
-            </div>
-          ) : (
+          {productsError && (
             <EmptyState
               icon={<PackageSearch size={30} />}
-              title="まだ商品がありません"
-              description="商品が出品されると、ここに一覧表示されます。"
+              title="商品を取得できませんでした"
+              description="通信状況を確認して、もう一度お試しください。"
+              action={
+                <Button
+                  onClick={() => void loadProducts()}
+                  disabled={isProductsLoading}
+                >
+                  再試行
+                </Button>
+              }
             />
-          ))}
-      </section>
-    </div>
+          )}
+
+          {!isProductsLoading &&
+            !productsError &&
+            (products.length > 0 ? (
+              <div className="product-grid store-product">
+                {products.map((product) => (
+                  <ProductCard product={product} store={store} key={product.id} />
+                ))}
+              </div>
+            ) : (
+              <EmptyState
+                icon={<PackageSearch size={30} />}
+                title="まだ商品がありません"
+                description="商品が出品されると、ここに一覧表示されます。"
+              />
+            ))}
+        </section>
+      </div> 
+      
+    </div> 
   );
 }
